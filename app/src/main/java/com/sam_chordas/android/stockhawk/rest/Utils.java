@@ -1,7 +1,10 @@
 package com.sam_chordas.android.stockhawk.rest;
 
 import android.content.ContentProviderOperation;
+import android.content.Context;
 import android.util.Log;
+import android.widget.Toast;
+
 import com.sam_chordas.android.stockhawk.data.QuoteColumns;
 import com.sam_chordas.android.stockhawk.data.QuoteProvider;
 import java.util.ArrayList;
@@ -14,6 +17,7 @@ import org.json.JSONObject;
  */
 public class Utils {
 
+  private static final String TAG = "Utils";
   private static String LOG_TAG = Utils.class.getSimpleName();
 
   public static boolean showPercent = true;
@@ -26,25 +30,38 @@ public class Utils {
     try{
       jsonObject = new JSONObject(JSON);
       if (jsonObject != null && jsonObject.length() != 0){
-        jsonObject = jsonObject.getJSONObject("query");
-        int count = Integer.parseInt(jsonObject.getString("count"));
-        if (count == 1){
-          jsonObject = jsonObject.getJSONObject("results")
-              .getJSONObject("quote");
-          batchOperations.add(buildBatchOperation(jsonObject));
-        } else{
-          resultsArray = jsonObject.getJSONObject("results").getJSONArray("quote");
+        jsonObject = jsonObject.optJSONObject("query");
+        if(jsonObject !=null) {
+            int count = Integer.parseInt(jsonObject.optString("count"));
+            if (count == 1) {
+                jsonObject = jsonObject.optJSONObject("results")
+                        .optJSONObject("quote");
+                Log.d(TAG, "Quote :  " + jsonObject.toString());
+                Log.d(TAG, "Ask value : " + String.valueOf(jsonObject.getString("Change")));
+                if (String.valueOf(jsonObject.optString("Change")).equals(null)) {
+                    Log.d(TAG, "Utils : This is  null");
+                    return null;
+                } else {
+                    batchOperations.add(buildBatchOperation(jsonObject));
+                }
 
-          if (resultsArray != null && resultsArray.length() != 0){
-            for (int i = 0; i < resultsArray.length(); i++){
-              jsonObject = resultsArray.getJSONObject(i);
-              batchOperations.add(buildBatchOperation(jsonObject));
+            } else {
+                resultsArray = jsonObject.getJSONObject("results").getJSONArray("quote");
+
+                if (resultsArray != null && resultsArray.length() != 0) {
+                    for (int i = 0; i < resultsArray.length(); i++) {
+                        jsonObject = resultsArray.getJSONObject(i);
+                        batchOperations.add(buildBatchOperation(jsonObject));
+                    }
+                }
             }
-          }
+        }
+          else{
+            Log.d(TAG, "error result : called " );
         }
       }
     } catch (JSONException e){
-      Log.e(LOG_TAG, "String to JSON failed: " + e);
+       Log.e(LOG_TAG, "String to JSON failed: " + e);
     }
     return batchOperations;
   }
