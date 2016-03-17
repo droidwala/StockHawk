@@ -1,9 +1,11 @@
 package com.sam_chordas.android.stockhawk.ui;
 
 import android.app.LoaderManager;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.CursorLoader;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.Loader;
 import android.database.Cursor;
 import android.net.ConnectivityManager;
@@ -15,10 +17,14 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.text.InputType;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.sam_chordas.android.stockhawk.R;
@@ -35,15 +41,9 @@ import com.google.android.gms.gcm.Task;
 import com.melnykov.fab.FloatingActionButton;
 import com.sam_chordas.android.stockhawk.touch_helper.SimpleItemTouchHelperCallback;
 
-public class MyStocksActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor>{
+public class MyStocksActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor>,View.OnClickListener{
 
-  /**
-   * Fragment managing the behaviors, interactions and presentation of the navigation drawer.
-   */
-
-  /**
-   * Used to store the last screen title. For use in {@link #restoreActionBar()}.
-   */
+  private static final String TAG = "MyStocksActivity";
   private CharSequence mTitle;
   private Intent mServiceIntent;
   private ItemTouchHelper mItemTouchHelper;
@@ -51,32 +51,42 @@ public class MyStocksActivity extends AppCompatActivity implements LoaderManager
   private QuoteCursorAdapter mCursorAdapter;
   private Context mContext;
   private Cursor mCursor;
-  boolean isConnected;
+  private ProgressBarReceiver receiver;
+    RecyclerView recyclerView;
+    ProgressBar progressBar;
+    TextView error_txt;
+    Button retry_connection;
+    ConnectivityManager cm;
+    NetworkInfo activeNetwork;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     mContext = this;
-    ConnectivityManager cm =
-        (ConnectivityManager) mContext.getSystemService(Context.CONNECTIVITY_SERVICE);
 
-    NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
-    isConnected = activeNetwork != null &&
-        activeNetwork.isConnectedOrConnecting();
     setContentView(R.layout.activity_my_stocks);
+      progressBar = (ProgressBar) findViewById(R.id.progressbar);
+      error_txt = (TextView) findViewById(R.id.error_txt);
+      retry_connection = (Button) findViewById(R.id.retry_connection);
+      retry_connection.setOnClickListener(this);
+      recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
+
     // The intent service is for executing immediate pulls from the Yahoo API
     // GCMTaskService can only schedule tasks, they cannot execute immediately
     mServiceIntent = new Intent(this, StockIntentService.class);
+      //Registering for ProgressBar Receiver
+
+      IntentFilter filter = new IntentFilter(ProgressBarReceiver.RECEIVER_NAME);
+      filter.addCategory(Intent.CATEGORY_DEFAULT);
+      receiver = new ProgressBarReceiver();
+      registerReceiver(receiver,filter);
+
     if (savedInstanceState == null){
       // Run the initialize task service so that some stocks appear upon an empty database
       mServiceIntent.putExtra("tag", "init");
-      if (isConnected){
-        startService(mServiceIntent);
-      } else{
-        networkToast();
-      }
+      FetchData();
     }
-    RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
+
     recyclerView.setLayoutManager(new LinearLayoutManager(this));
     getLoaderManager().initLoader(CURSOR_LOADER_ID, null, this);
 
@@ -95,7 +105,7 @@ public class MyStocksActivity extends AppCompatActivity implements LoaderManager
     fab.attachToRecyclerView(recyclerView);
     fab.setOnClickListener(new View.OnClickListener() {
       @Override public void onClick(View v) {
-        if (isConnected){
+        if (CheckConnection()){
           new MaterialDialog.Builder(mContext).title(R.string.symbol_search)
               .content(R.string.content_test)
               .inputType(InputType.TYPE_CLASS_TEXT)
@@ -105,7 +115,7 @@ public class MyStocksActivity extends AppCompatActivity implements LoaderManager
                   // in the DB and proceed accordingly
                   Cursor c = getContentResolver().query(QuoteProvider.Quotes.CONTENT_URI,
                       new String[] { QuoteColumns.SYMBOL }, QuoteColumns.SYMBOL + "= ?",
-                      new String[] { input.toString() }, null);
+                      new String[] { input.toString().toUpperCase() }, null);
                   if (c.getCount() != 0) {
                     Toast toast =
                         Toast.makeText(MyStocksActivity.this, "This stock is already saved!",
@@ -134,7 +144,7 @@ public class MyStocksActivity extends AppCompatActivity implements LoaderManager
     mItemTouchHelper.attachToRecyclerView(recyclerView);
 
     mTitle = getTitle();
-    if (isConnected){
+    if (CheckConnection()){
       long period = 3600L;
       long flex = 10L;
       String periodicTag = "periodic";
@@ -153,16 +163,55 @@ public class MyStocksActivity extends AppCompatActivity implements LoaderManager
       // are updated.
       GcmNetworkManager.getInstance(this).schedule(periodicTask);
     }
+
+
   }
 
+    private boolean CheckConnection(){
+        cm = (ConnectivityManager) mContext.getSystemService(Context.CONNECTIVITY_SERVICE);
+        activeNetwork = cm.getActiveNetworkInfo();
+        return (activeNetwork != null &&
+                activeNetwork.isConnectedOrConnecting());
+    }
 
-  @Override
-  public void onResume() {
-    super.onResume();
-    getLoaderManager().restartLoader(CURSOR_LOADER_ID, null, this);
-  }
+    private void FetchData(){
+        if (CheckConnection()){
+            Log.d(TAG, "FetchData: ");
+            retry_connection.setVisibility(View.INVISIBLE);
+            error_txt.setVisibility(View.INVISIBLE);
+            progressBar.setVisibility(View.VISIBLE);
+            recyclerView.setVisibility(View.VISIBLE);
+            startService(mServiceIntent);
+        }
+        else{
+            recyclerView.setVisibility(View.INVISIBLE);
+            progressBar.setVisibility(View.INVISIBLE);
+            retry_connection.setVisibility(View.VISIBLE);
+            error_txt.setVisibility(View.VISIBLE);
+            error_txt.setText("Seems like you are not connected to internet.\n Please check your network settings!");
+        }
+    }
 
-  public void networkToast(){
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        getLoaderManager().restartLoader(CURSOR_LOADER_ID, null, this);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if(receiver!=null)
+            unregisterReceiver(receiver);
+    }
+
+    public void networkToast(){
     Toast.makeText(mContext, getString(R.string.network_toast), Toast.LENGTH_SHORT).show();
   }
 
@@ -223,4 +272,34 @@ public class MyStocksActivity extends AppCompatActivity implements LoaderManager
     mCursorAdapter.swapCursor(null);
   }
 
+    @Override
+    public void onClick(View view) {
+        if(view.getId()==R.id.retry_connection){
+            Log.d(TAG, "onClick: called " );
+            FetchData();
+        }
+    }
+
+    public class ProgressBarReceiver extends BroadcastReceiver{
+
+        public static final String RECEIVER_NAME ="com.example.intent.action.PROGRESS_BAR";
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            progressBar.setVisibility(View.INVISIBLE);
+            if(error_txt.getVisibility() == View.VISIBLE)
+                error_txt.setVisibility(View.INVISIBLE);
+
+            if(intent.getIntExtra("RESULT", 99) == 5) {
+                Toast.makeText(context, "No Stock found by that name", Toast.LENGTH_SHORT).show();
+            }
+            else if(intent.getIntExtra("RESULT",99) == 6){
+                Toast.makeText(context,"Server seems to be busy.Please try again after some time!",Toast.LENGTH_SHORT).show();
+            }
+            else if(intent.getIntExtra("RESULT",99) == 7){
+                Log.d(TAG, "New Stock added: Count " + String.valueOf(mCursorAdapter.getItemCount()));
+               recyclerView.smoothScrollToPosition(mCursorAdapter.getItemCount());
+            }
+
+        }
+    }
 }

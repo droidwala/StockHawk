@@ -22,4 +22,31 @@
         fab:layout_anchor="recycler_view"
         fab:layout_anchorGravity="bottom | right | end"
         android:contentDescription="@string/fab_btn_description"/>
+    <ProgressBar
+        android:id="@+id/progressbar"
+        android:layout_width="@dimen/progress_bar_circular_size"
+        android:layout_height="@dimen/progress_bar_circular_size"
+        android:visibility="invisible"
+        android:layout_gravity="center"
+        style="@style/Widget.AppCompat.ProgressBar"/>
+    <TextView
+        android:id="@+id/error_txt"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="invisible"
+        android:layout_marginLeft="30dp"
+        android:layout_marginRight="30dp"
+        android:layout_gravity="center"
+        android:gravity="center"/>
+    <Button
+        android:id="@+id/retry_connection"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center|bottom"
+        android:layout_marginBottom="25dp"
+        android:text="RETRY"
+        android:background="@color/material_green_700"
+        android:textStyle="bold"
+        android:visibility="invisible"/>
+
 </FrameLayout>

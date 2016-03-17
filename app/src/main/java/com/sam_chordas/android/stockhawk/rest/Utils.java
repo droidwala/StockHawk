@@ -18,15 +18,18 @@ import org.json.JSONObject;
 public class Utils {
 
   private static final String TAG = "Utils";
+  private static final int SERVICE_DOWN = 4;
   private static String LOG_TAG = Utils.class.getSimpleName();
 
   public static boolean showPercent = true;
 
   public static ArrayList quoteJsonToContentVals(String JSON){
     ArrayList<ContentProviderOperation> batchOperations = new ArrayList<>();
+    ArrayList<String> noStockFound = new ArrayList<String>();
+    ArrayList<String> tryAgain = new ArrayList<String>();
     JSONObject jsonObject = null;
     JSONArray resultsArray = null;
-    Log.i(LOG_TAG, "GET FB: " +JSON);
+    Log.i(LOG_TAG, "GET FB: " + JSON);
     try{
       jsonObject = new JSONObject(JSON);
       if (jsonObject != null && jsonObject.length() != 0){
@@ -44,9 +47,10 @@ public class Utils {
                 }
                 if (!ask_value.equals("null")) {
                     Log.d(TAG, "Ask Value :  " + ask_value);
-                    Log.d(TAG, "Utils : Not null MC!!");
+                    Log.d(TAG, "Utils : This is Not null!!");
                     batchOperations.add(buildBatchOperation(jsonObject));
                 } else {
+                    //No Stock found edge case handled
                     Log.d(TAG, "Utils : This is null");
                     return null;
                 }
@@ -63,7 +67,9 @@ public class Utils {
             }
         }
           else{
+            //Server down or network error edge case handled
             Log.d(TAG, "error result : called " );
+            return null;
         }
       }
     } catch (JSONException e){
@@ -99,7 +105,7 @@ public class Utils {
         QuoteProvider.Quotes.CONTENT_URI);
     try {
       String change = jsonObject.getString("Change");
-      builder.withValue(QuoteColumns.SYMBOL, jsonObject.getString("symbol"));
+      builder.withValue(QuoteColumns.SYMBOL, jsonObject.getString("symbol").toUpperCase());
       builder.withValue(QuoteColumns.BIDPRICE, truncateBidPrice(jsonObject.getString("Bid")));
       builder.withValue(QuoteColumns.PERCENT_CHANGE, truncateChange(
           jsonObject.getString("ChangeinPercent"), true));
