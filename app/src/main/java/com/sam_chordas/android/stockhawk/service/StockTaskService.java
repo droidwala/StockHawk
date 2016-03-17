@@ -33,12 +33,17 @@ import java.util.ArrayList;
  */
 public class StockTaskService extends GcmTaskService{
   private static final String TAG = "StockTaskService";
+  private static final int NO_STOCK_FOUND = 5;
+  private static final int SERVER_ISSUE = 6;
+  private static final int NEW_STOCK_ADDED = 7;
+  private static final int UPDATING_EXISTING = 10;
   private String LOG_TAG = StockTaskService.class.getSimpleName();
 
   private OkHttpClient client = new OkHttpClient();
   private Context mContext;
   private StringBuilder mStoredSymbols = new StringBuilder();
   private boolean isUpdate;
+  private boolean isSuccessful;
 
   public StockTaskService(){}
 
@@ -51,6 +56,7 @@ public class StockTaskService extends GcmTaskService{
         .build();
 
     Response response = client.newCall(request).execute();
+    isSuccessful = response.isSuccessful();
     return response.body().string();
   }
 
@@ -120,9 +126,10 @@ public class StockTaskService extends GcmTaskService{
       urlString = urlStringBuilder.toString();
       try{
         getResponse = fetchData(urlString);
+
         Log.d(TAG, "onRunTask: URL " + urlString);
         Log.d(TAG, "onRunTask: Response " + getResponse);
-        result = GcmNetworkManager.RESULT_SUCCESS;
+
         try {
           ArrayList<ContentProviderOperation> batchOperations = new ArrayList<>();
           batchOperations = Utils.quoteJsonToContentVals(getResponse);
@@ -134,31 +141,36 @@ public class StockTaskService extends GcmTaskService{
               contentValues.put(QuoteColumns.ISCURRENT, 0);
               mContext.getContentResolver().update(QuoteProvider.Quotes.CONTENT_URI, contentValues,
                       null, null);
+                result = UPDATING_EXISTING;
+            }
+            else{
+                result = NEW_STOCK_ADDED;
             }
             mContext.getContentResolver().applyBatch(QuoteProvider.AUTHORITY,
                     batchOperations);
+
+
           }
           else{
-            Log.d(TAG, "Response Result : null");
-            Handler h = new Handler(Looper.getMainLooper());
-            h.post(new Runnable() {
-              @Override
-              public void run() {
-                  Toast.makeText(mContext,"No stock found by that name",Toast.LENGTH_SHORT).show();
-                }
-            });
+            if(isSuccessful) {
+              result = NO_STOCK_FOUND;
+            }
+            else{
+              result = SERVER_ISSUE;
+            }
 
           }
 
         }
-        catch (RemoteException | OperationApplicationException e){
-          Log.e(LOG_TAG, "Error applying batch insert", e);
+        catch (RemoteException | OperationApplicationException e) {
+            Log.e(LOG_TAG, "Error applying batch insert", e);
         }
       } catch (IOException e){
         e.printStackTrace();
       }
     }
 
+    Log.d(TAG, "Result returned : " + String.valueOf(result));
     return result;
   }
 
