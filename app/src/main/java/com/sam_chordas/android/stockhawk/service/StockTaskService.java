@@ -1,10 +1,13 @@
 package com.sam_chordas.android.stockhawk.service;
 
+import android.content.ContentProviderOperation;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.OperationApplicationException;
 import android.database.Cursor;
 import android.database.DatabaseUtils;
+import android.os.Handler;
+import android.os.Looper;
 import android.os.RemoteException;
 import android.util.Log;
 import android.widget.Toast;
@@ -21,6 +24,7 @@ import com.squareup.okhttp.Response;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.util.ArrayList;
 
 /**
  * Created by sam_chordas on 9/30/15.
@@ -93,7 +97,8 @@ public class StockTaskService extends GcmTaskService{
           e.printStackTrace();
         }
       }
-    } else if (params.getTag().equals("add")){
+    }
+    else if (params.getTag().equals("add")){
       isUpdate = false;
       // get symbol from params.getExtra and build query
       String stockInput = params.getExtras().getString("symbol");
@@ -115,10 +120,14 @@ public class StockTaskService extends GcmTaskService{
       urlString = urlStringBuilder.toString();
       try{
         getResponse = fetchData(urlString);
-        Log.d(TAG, "onRunTask: " + getResponse);
+        Log.d(TAG, "onRunTask: URL " + urlString);
+        Log.d(TAG, "onRunTask: Response " + getResponse);
         result = GcmNetworkManager.RESULT_SUCCESS;
         try {
-          if(Utils.quoteJsonToContentVals(getResponse) != null) {
+          ArrayList<ContentProviderOperation> batchOperations = new ArrayList<>();
+          batchOperations = Utils.quoteJsonToContentVals(getResponse);
+          if(batchOperations!=null && batchOperations.size()>0) {
+            Log.d(TAG, "Response Result : Not null");
             ContentValues contentValues = new ContentValues();
             // update ISCURRENT to 0 (false) so new data is current
             if (isUpdate) {
@@ -127,15 +136,23 @@ public class StockTaskService extends GcmTaskService{
                       null, null);
             }
             mContext.getContentResolver().applyBatch(QuoteProvider.AUTHORITY,
-                    Utils.quoteJsonToContentVals(getResponse));
+                    batchOperations);
           }
           else{
-            if(isUpdate){
-              Toast.makeText(mContext,"Nothing added Bro!!",Toast.LENGTH_SHORT).show();
-            }
-            else{
-              Toast.makeText(mContext,"No stock found by that name",Toast.LENGTH_SHORT).show();
-            }
+            Log.d(TAG, "Response Result : null");
+            Handler h = new Handler(Looper.getMainLooper());
+            h.post(new Runnable() {
+              @Override
+              public void run() {
+                if(isUpdate){
+                  Toast.makeText(mContext,"Nothing added Bro!!",Toast.LENGTH_SHORT).show();
+                }
+                else{
+                  Toast.makeText(mContext,"No stock found by that name",Toast.LENGTH_SHORT).show();
+                }
+              }
+            });
+
           }
 
         }

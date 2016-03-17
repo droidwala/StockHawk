@@ -37,12 +37,18 @@ public class Utils {
                 jsonObject = jsonObject.optJSONObject("results")
                         .optJSONObject("quote");
                 Log.d(TAG, "Quote :  " + jsonObject.toString());
-                Log.d(TAG, "Ask value : " + String.valueOf(jsonObject.getString("Change")));
-                if (String.valueOf(jsonObject.optString("Change")).equals(null)) {
-                    Log.d(TAG, "Utils : This is  null");
-                    return null;
-                } else {
+                //Log.d(TAG, "Ask value : " + jsonObject.optString("Ask"));
+                String ask_value = null;
+                if(jsonObject.has("Ask")) {
+                    ask_value = jsonObject.getString("Ask");
+                }
+                if (!ask_value.equals("null")) {
+                    Log.d(TAG, "Ask Value :  " + ask_value);
+                    Log.d(TAG, "Utils : Not null MC!!");
                     batchOperations.add(buildBatchOperation(jsonObject));
+                } else {
+                    Log.d(TAG, "Utils : This is null");
+                    return null;
                 }
 
             } else {
