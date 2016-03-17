@@ -144,13 +144,8 @@ public class StockTaskService extends GcmTaskService{
             h.post(new Runnable() {
               @Override
               public void run() {
-                if(isUpdate){
-                  Toast.makeText(mContext,"Nothing added Bro!!",Toast.LENGTH_SHORT).show();
-                }
-                else{
                   Toast.makeText(mContext,"No stock found by that name",Toast.LENGTH_SHORT).show();
                 }
-              }
             });
 
           }
