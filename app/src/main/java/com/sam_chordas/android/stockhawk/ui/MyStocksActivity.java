@@ -22,6 +22,7 @@ import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -40,7 +41,7 @@ import com.google.android.gms.gcm.Task;
 import com.melnykov.fab.FloatingActionButton;
 import com.sam_chordas.android.stockhawk.touch_helper.SimpleItemTouchHelperCallback;
 
-public class MyStocksActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor>{
+public class MyStocksActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor>,View.OnClickListener{
 
   private static final String TAG = "MyStocksActivity";
   private CharSequence mTitle;
@@ -50,26 +51,28 @@ public class MyStocksActivity extends AppCompatActivity implements LoaderManager
   private QuoteCursorAdapter mCursorAdapter;
   private Context mContext;
   private Cursor mCursor;
-  boolean isConnected;
+
   private ProgressBarReceiver receiver;
     RecyclerView recyclerView;
     ProgressBar progressBar;
     TextView error_txt;
+    Button retry_connection;
+    FloatingActionButton fab;
+    ConnectivityManager cm;
+    NetworkInfo activeNetwork;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     mContext = this;
-    ConnectivityManager cm =
-        (ConnectivityManager) mContext.getSystemService(Context.CONNECTIVITY_SERVICE);
 
-    NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
-    isConnected = activeNetwork != null &&
-        activeNetwork.isConnectedOrConnecting();
     setContentView(R.layout.activity_my_stocks);
       progressBar = (ProgressBar) findViewById(R.id.progressbar);
       error_txt = (TextView) findViewById(R.id.error_txt);
+      retry_connection = (Button) findViewById(R.id.retry_connection);
+      retry_connection.setOnClickListener(this);
       recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
+      fab = (FloatingActionButton) findViewById(R.id.fab);
 
     // The intent service is for executing immediate pulls from the Yahoo API
     // GCMTaskService can only schedule tasks, they cannot execute immediately
@@ -79,21 +82,13 @@ public class MyStocksActivity extends AppCompatActivity implements LoaderManager
       IntentFilter filter = new IntentFilter(ProgressBarReceiver.RECEIVER_NAME);
       filter.addCategory(Intent.CATEGORY_DEFAULT);
       receiver = new ProgressBarReceiver();
-      registerReceiver(receiver,filter);
+      registerReceiver(receiver, filter);
 
     if (savedInstanceState == null){
       // Run the initialize task service so that some stocks appear upon an empty database
       mServiceIntent.putExtra("tag", "init");
-      if (isConnected){
-          progressBar.setVisibility(View.VISIBLE);
-          startService(mServiceIntent);
-      }
-      else{
-        recyclerView.setVisibility(View.INVISIBLE);
-        progressBar.setVisibility(View.INVISIBLE);
-        error_txt.setVisibility(View.VISIBLE);
-        error_txt.setText("You are not connected to internet now.\n Please check your network settings!");
-      }
+      FetchData();
+
     }
 
     recyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -102,19 +97,19 @@ public class MyStocksActivity extends AppCompatActivity implements LoaderManager
     mCursorAdapter = new QuoteCursorAdapter(this, null);
     recyclerView.addOnItemTouchListener(new RecyclerViewItemClickListener(this,
             new RecyclerViewItemClickListener.OnItemClickListener() {
-              @Override public void onItemClick(View v, int position) {
-                //TODO:
-                // do something on item click
-              }
+                @Override
+                public void onItemClick(View v, int position) {
+                    //TODO:
+                    // do something on item click
+                }
             }));
     recyclerView.setAdapter(mCursorAdapter);
 
-
-    FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+    //Searching Stocks by Name
     fab.attachToRecyclerView(recyclerView);
     fab.setOnClickListener(new View.OnClickListener() {
       @Override public void onClick(View v) {
-        if (isConnected){
+        if (CheckConnection()){
           new MaterialDialog.Builder(mContext).title(R.string.symbol_search)
               .content(R.string.content_test)
               .inputType(InputType.TYPE_CLASS_TEXT)
@@ -153,7 +148,7 @@ public class MyStocksActivity extends AppCompatActivity implements LoaderManager
     mItemTouchHelper.attachToRecyclerView(recyclerView);
 
     mTitle = getTitle();
-    if (isConnected){
+    if (CheckConnection()){
       long period = 3600L;
       long flex = 10L;
       String periodicTag = "periodic";
@@ -175,6 +170,34 @@ public class MyStocksActivity extends AppCompatActivity implements LoaderManager
 
 
   }
+
+    private boolean CheckConnection(){
+        cm = (ConnectivityManager) mContext.getSystemService(Context.CONNECTIVITY_SERVICE);
+        activeNetwork = cm.getActiveNetworkInfo();
+        return (activeNetwork != null &&
+                activeNetwork.isConnectedOrConnecting());
+    }
+
+    private void FetchData(){
+        if (CheckConnection()){
+            Log.d(TAG, "FetchData: ");
+            retry_connection.setVisibility(View.INVISIBLE);
+            error_txt.setVisibility(View.INVISIBLE);
+            progressBar.setVisibility(View.VISIBLE);
+            recyclerView.setVisibility(View.VISIBLE);
+            fab.setVisibility(View.VISIBLE);
+            startService(mServiceIntent);
+        }
+        else{
+            recyclerView.setVisibility(View.INVISIBLE);
+            fab.setVisibility(View.INVISIBLE);
+            progressBar.setVisibility(View.INVISIBLE);
+            retry_connection.setVisibility(View.VISIBLE);
+            error_txt.setVisibility(View.VISIBLE);
+            error_txt.setText("Seems like you are not connected to internet.\n Please check your network settings!");
+        }
+    }
+
 
 
     @Override
@@ -255,6 +278,15 @@ public class MyStocksActivity extends AppCompatActivity implements LoaderManager
   public void onLoaderReset(Loader<Cursor> loader){
     mCursorAdapter.swapCursor(null);
   }
+
+
+    @Override
+    public void onClick(View view) {
+        if(view.getId()==R.id.retry_connection){
+            Log.d(TAG, "onClick: called " );
+            FetchData();
+        }
+    }
 
     public class ProgressBarReceiver extends BroadcastReceiver{
 

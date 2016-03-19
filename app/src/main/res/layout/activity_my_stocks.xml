@@ -38,5 +38,16 @@
         android:layout_marginRight="30dp"
         android:layout_gravity="center"
         android:gravity="center"/>
+    <Button
+        android:id="@+id/retry_connection"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center|bottom"
+        android:layout_marginBottom="25dp"
+        android:text="RETRY"
+        android:background="@color/material_green_700"
+        android:textStyle="bold"
+        android:visibility="invisible"/>
+
 
 </FrameLayout>
