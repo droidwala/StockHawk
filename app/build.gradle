@@ -37,4 +37,5 @@ dependencies {
   } // used to create custom material design like dialogs all the way till api-8
   compile 'com.diogobernardino:williamchart:2.2'
   compile 'com.google.code.gson:gson:2.6.2'
+  compile 'com.android.support:cardview-v7:23.1.1'
 }

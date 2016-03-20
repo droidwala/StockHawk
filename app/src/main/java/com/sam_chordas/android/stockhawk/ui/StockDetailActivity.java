@@ -2,13 +2,14 @@ package com.sam_chordas.android.stockhawk.ui;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.CardView;
 import android.util.Log;
 import android.widget.ArrayAdapter;
-import android.widget.ListView;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.sam_chordas.android.stockhawk.R;
+import com.sam_chordas.android.stockhawk.charts.LineCardOne;
 import com.sam_chordas.android.stockhawk.pojo.History;
 import com.squareup.okhttp.Callback;
 import com.squareup.okhttp.OkHttpClient;
@@ -22,24 +23,20 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.Locale;
 
 public class StockDetailActivity extends AppCompatActivity{
 
     private static final String TAG = "StockDetailActivity";
-    ListView lv;
     private final OkHttpClient client = new OkHttpClient();
     private String BASE_URL = "https://query.yahooapis.com/v1/public/yql?q=";
     private String startDate = "",endDate = "";
     ArrayAdapter<String> adapter;
 
-    Date date;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.stock_detail);
-        lv = (ListView) findViewById(R.id.current_week);
         Bundle b = getIntent().getExtras();
         String stock_name = b.getString("STOCK");
         Log.d(TAG, "onCreate: called " + b.getString("STOCK"));
@@ -86,15 +83,16 @@ public class StockDetailActivity extends AppCompatActivity{
                 ArrayList<History.QueryEntity.ResultsEntity.QuoteEntity> quotes = (ArrayList<History.QueryEntity.ResultsEntity.QuoteEntity>) history.getQuery().getResults().getQuote();
 
                 Log.d(TAG, "onResponse: after parsing " + String.valueOf(quotes.size())) ;
-                ArrayList<String> close_amt = new ArrayList<String>();
+                final ArrayList<String> close_amt = new ArrayList<String>();
                 for (int i = 0; i < quotes.size(); i++) {
                     close_amt.add(quotes.get(i).getAdj_Close());
                 }
+
                 adapter = new ArrayAdapter<String>(StockDetailActivity.this,android.R.layout.simple_list_item_1,close_amt);
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        lv.setAdapter(adapter);
+                        (new LineCardOne((CardView)findViewById(R.id.weekly_card),StockDetailActivity.this,close_amt)).show();
                     }
                 });
             }
