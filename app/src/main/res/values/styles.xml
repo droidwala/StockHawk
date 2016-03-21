@@ -1,11 +1,17 @@
 <resources>
 
   <!-- Base application theme. -->
-  <style name="AppTheme" parent="Theme.AppCompat">
+  <style name="AppTheme" parent="Base.Theme.AppCompat.Light.DarkActionBar">
       <item name="colorPrimary">@color/material_blue_500</item>
       <item name="colorPrimaryDark">@color/material_blue_700</item>
     <!-- Customize your theme here. -->
   </style>
+
+  <style name="AppTheme.NoActionBar">
+    <item name="windowActionBar">false</item>
+    <item name="windowNoTitle">true</item>
+  </style>
+
 
   <style name="PercentChangeTextStyle">
     <item name="android:textSize">20sp</item>
@@ -19,5 +25,7 @@
     <item name="android:textSize">25sp</item>
     <item name="android:textAllCaps">true</item>
   </style>
+
+
 
 </resources>

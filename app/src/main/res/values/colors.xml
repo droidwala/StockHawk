@@ -6,4 +6,6 @@
   <color name="material_green_700">#00C853</color>
   <color name="weekly_card_background">#343f57</color>
   <color name="monthly_card_background">#364d5a</color>
+  <color name="sixty_days_card_background">#ffcc6a</color>
+  <color name="colorWhite">#FFFFFF</color>
 </resources>

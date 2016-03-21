@@ -1,54 +1,104 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<android.support.design.widget.CoordinatorLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
-    <android.support.v7.widget.CardView
-        android:id="@+id/weekly_card"
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true">
+    <android.support.design.widget.AppBarLayout
+        android:id="@+id/appbar"
         android:layout_width="match_parent"
-        android:layout_height="200dp"
-        android:layout_margin="5dp"
-        app:cardCornerRadius="4dp"
-        app:cardBackgroundColor="@color/weekly_card_background">
-        <com.db.chart.view.LineChartView
-            android:id="@+id/weekly_bar_chart"
+        android:layout_height="?attr/actionBarSize"
+        android:theme="@style/ThemeOverlay.AppCompat.ActionBar">
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/toolbar"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_margin="16dp"
-            app:chart_fontSize="16sp"/>
+            android:layout_height="wrap_content"
+            app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
+            app:layout_scrollFlags="scroll|enterAlways"/>
+    </android.support.design.widget.AppBarLayout>
 
-    </android.support.v7.widget.CardView>
-
-    <android.support.v7.widget.CardView
-        android:id="@+id/monthly_card"
+    <android.support.v4.widget.NestedScrollView
         android:layout_width="match_parent"
-        android:layout_height="250dp"
-        app:cardCornerRadius="4dp"
-        android:layout_margin="5dp"
-        app:cardBackgroundColor="@color/monthly_card_background">
+        android:layout_height="match_parent"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:orientation="vertical">
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="top|right"
-                android:text="@string/monthly_chart_header"
-                android:layout_margin="12dp"
-                android:drawableLeft="@drawable/oval_point"
-                android:drawablePadding="4dp"
-                android:textStyle="bold"/>
-            <com.db.chart.view.LineChartView
-                android:id="@+id/monthly_line_chart"
+            <android.support.v7.widget.CardView
+                android:id="@+id/weekly_card"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_margin="16dp"
-                app:chart_axisColor="#30547d99"/>
+                android:layout_height="200dp"
+                android:layout_margin="5dp"
+                app:cardCornerRadius="4dp"
+                app:cardBackgroundColor="@color/weekly_card_background">
+                <com.db.chart.view.LineChartView
+                    android:id="@+id/weekly_bar_chart"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_margin="16dp"
+                    app:chart_fontSize="16sp"/>
+
+            </android.support.v7.widget.CardView>
+            <android.support.v7.widget.CardView
+                android:id="@+id/monthly_card"
+                android:layout_width="match_parent"
+                android:layout_height="250dp"
+                app:cardCornerRadius="4dp"
+                android:layout_margin="5dp"
+                app:cardBackgroundColor="@color/monthly_card_background">
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="top|right"
+                        android:text="@string/monthly_chart_header"
+                        android:layout_margin="12dp"
+                        android:drawableLeft="@drawable/oval_point"
+                        android:drawablePadding="4dp"
+                        android:textColor="@color/colorWhite"
+                        android:textStyle="bold"/>
+                    <com.db.chart.view.LineChartView
+                        android:id="@+id/monthly_line_chart"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_margin="16dp"
+                        app:chart_axisColor="#30547d99"/>
+                </LinearLayout>
+            </android.support.v7.widget.CardView>
+
+            <android.support.v7.widget.CardView
+                android:id="@+id/sixty_days_card"
+                android:layout_width="match_parent"
+                android:layout_height="250dp"
+                app:cardCornerRadius="4dp"
+                android:layout_margin="5dp"
+                app:cardBackgroundColor="@color/sixty_days_card_background">
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="top|right"
+                        android:text="@string/sixty_chart_header"
+                        android:layout_margin="12dp"
+                        android:drawableLeft="@drawable/oval_point"
+                        android:drawablePadding="4dp"
+                        android:textStyle="bold"/>
+                    <com.db.chart.view.LineChartView
+                        android:id="@+id/sixty_days_line_chart"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_margin="16dp"
+                        app:chart_axisColor="#30547d99"/>
+                </LinearLayout>
+            </android.support.v7.widget.CardView>
         </LinearLayout>
-
-    </android.support.v7.widget.CardView>
-
-</LinearLayout>
+    </android.support.v4.widget.NestedScrollView>
+</android.support.design.widget.CoordinatorLayout>
