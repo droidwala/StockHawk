@@ -25,6 +25,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Locale;
 
 public class StockDetailActivity extends AppCompatActivity{
@@ -33,7 +34,6 @@ public class StockDetailActivity extends AppCompatActivity{
     private final OkHttpClient client = new OkHttpClient();
     private String BASE_URL = "https://query.yahooapis.com/v1/public/yql?q=";
     private String startDate = "",endDate = "",today_date="",past_thirty="",past_sixty="";
-    ArrayAdapter<String> adapter;
     private String stock_name;
 
     @Override
@@ -147,14 +147,29 @@ public class StockDetailActivity extends AppCompatActivity{
                     ArrayList<History.QueryEntity.ResultsEntity.QuoteEntity> quotes = (ArrayList<History.QueryEntity.ResultsEntity.QuoteEntity>) history.getQuery().getResults().getQuote();
 
                     Log.d(TAG, "onResponse: after parsing " + String.valueOf(quotes.size()));
+
                     final ArrayList<String> monthly_close_amt = new ArrayList<String>();
+                    final ArrayList<String> dates = new ArrayList<String>();
                     for (int i = 0; i < quotes.size(); i++) {
+                        Log.d(TAG, "Data: " +  quotes.get(i).getDate() + " " + quotes.get(i).getAdj_Close());
+                        if(i==0){
+                            dates.add(quotes.get(i).getDate());
+                        }
+                        else if(i == quotes.size()-1){
+                            dates.add(quotes.get(i).getDate());
+                        }
+                        else{
+                            dates.add("");
+                        }
                         monthly_close_amt.add(quotes.get(i).getAdj_Close());
                     }
+
+                    Collections.reverse(monthly_close_amt);
+                    Collections.reverse(dates);
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            new LineCardTwo((CardView)findViewById(R.id.monthly_card),StockDetailActivity.this,monthly_close_amt).show();
+                            new LineCardTwo((CardView) findViewById(R.id.monthly_card), StockDetailActivity.this, monthly_close_amt,dates).show();
                             // new MPLineChart((CardView)findViewById(R.id.monthly_card),StockDetailActivity.this,monthly_close_amt).show();
                         }
                     });
