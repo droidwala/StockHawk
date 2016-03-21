@@ -10,6 +10,8 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.sam_chordas.android.stockhawk.R;
 import com.sam_chordas.android.stockhawk.charts.LineCardOne;
+import com.sam_chordas.android.stockhawk.charts.LineCardTwo;
+import com.sam_chordas.android.stockhawk.charts.MPLineChart;
 import com.sam_chordas.android.stockhawk.pojo.History;
 import com.squareup.okhttp.Callback;
 import com.squareup.okhttp.OkHttpClient;
@@ -30,15 +32,16 @@ public class StockDetailActivity extends AppCompatActivity{
     private static final String TAG = "StockDetailActivity";
     private final OkHttpClient client = new OkHttpClient();
     private String BASE_URL = "https://query.yahooapis.com/v1/public/yql?q=";
-    private String startDate = "",endDate = "";
+    private String startDate = "",endDate = "",today_date="",past_thirty="",past_sixty="";
     ArrayAdapter<String> adapter;
+    private String stock_name;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.stock_detail);
         Bundle b = getIntent().getExtras();
-        String stock_name = b.getString("STOCK");
+        stock_name = b.getString("STOCK");
         Log.d(TAG, "onCreate: called " + b.getString("STOCK"));
 
         InitializeStartAndEndDate();//Get start and end dates.
@@ -80,24 +83,90 @@ public class StockDetailActivity extends AppCompatActivity{
                 //Log.d(TAG, "onResponse: called " + response.body().string());
                 Gson gson = new Gson();
                 History history = gson.fromJson(response.body().string(),new TypeToken<History>(){}.getType());
-                ArrayList<History.QueryEntity.ResultsEntity.QuoteEntity> quotes = (ArrayList<History.QueryEntity.ResultsEntity.QuoteEntity>) history.getQuery().getResults().getQuote();
+                if(history.getQuery().getResults()!= null) {
+                    ArrayList<History.QueryEntity.ResultsEntity.QuoteEntity> quotes = (ArrayList<History.QueryEntity.ResultsEntity.QuoteEntity>) history.getQuery().getResults().getQuote();
 
-                Log.d(TAG, "onResponse: after parsing " + String.valueOf(quotes.size())) ;
-                final ArrayList<String> close_amt = new ArrayList<String>();
-                for (int i = 0; i < quotes.size(); i++) {
-                    close_amt.add(quotes.get(i).getAdj_Close());
+                    Log.d(TAG, "onResponse: after parsing " + String.valueOf(quotes.size()));
+                    final ArrayList<String> close_amt = new ArrayList<String>();
+                    for (int i = 0; i < quotes.size(); i++) {
+                        close_amt.add(quotes.get(i).getAdj_Close());
+                    }
+                }
+                else{
+                    Log.d(TAG, "onResponse: No data!!" );
                 }
 
-                adapter = new ArrayAdapter<String>(StockDetailActivity.this,android.R.layout.simple_list_item_1,close_amt);
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        (new LineCardOne((CardView)findViewById(R.id.weekly_card),StockDetailActivity.this,close_amt)).show();
+                        //(new LineCardOne((CardView)findViewById(R.id.weekly_card),StockDetailActivity.this,close_amt)).show();
+                        PastThirty();
+                        StringBuilder urlString = new StringBuilder();
+                        urlString.append(BASE_URL);
+                        try {
+                            urlString.append(URLEncoder.encode("select * from yahoo.finance.historicaldata where symbol = ","UTF-8"));
+                            urlString.append(URLEncoder.encode("\"" + stock_name + "\"","UTF-8"));
+                            urlString.append(URLEncoder.encode(" and startDate = " + "\"" + past_thirty + "\"","UTF-8"));
+                            urlString.append(URLEncoder.encode(" and endDate = " + "\"" + today_date + "\"","UTF-8"));
+                            urlString.append("&format=json&diagnostics=true&env=store%3A%2F%2Fdatatables.org%2Falltableswithkeys&callback=");
+
+                        } catch (UnsupportedEncodingException e) {
+                            e.printStackTrace();
+                        }
+                        try {
+                            FetchMonthlyData(urlString.toString());
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+
                     }
                 });
+
             }
         });
 
+    }
+
+    private void FetchMonthlyData(String url) throws IOException{
+
+        Request request = new Request.Builder()
+                .url(url).build();
+
+        client.newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(Request request, IOException e) {
+                e.printStackTrace();
+            }
+
+            @Override
+            public void onResponse(Response response) throws IOException {
+                //Log.d(TAG, "onResponse: called " + response.body().string());
+                Gson gson = new Gson();
+                History history = gson.fromJson(response.body().string(),new TypeToken<History>(){}.getType());
+                if(history.getQuery().getResults()!= null) {
+                    ArrayList<History.QueryEntity.ResultsEntity.QuoteEntity> quotes = (ArrayList<History.QueryEntity.ResultsEntity.QuoteEntity>) history.getQuery().getResults().getQuote();
+
+                    Log.d(TAG, "onResponse: after parsing " + String.valueOf(quotes.size()));
+                    final ArrayList<String> monthly_close_amt = new ArrayList<String>();
+                    for (int i = 0; i < quotes.size(); i++) {
+                        monthly_close_amt.add(quotes.get(i).getAdj_Close());
+                    }
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            new LineCardTwo((CardView)findViewById(R.id.monthly_card),StockDetailActivity.this,monthly_close_amt).show();
+                            // new MPLineChart((CardView)findViewById(R.id.monthly_card),StockDetailActivity.this,monthly_close_amt).show();
+                        }
+                    });
+                }
+                else{
+                    Log.d(TAG, "onResponse: No data!!" );
+                }
+
+
+
+            }
+        });
     }
 
     private void InitializeStartAndEndDate(){
@@ -108,6 +177,15 @@ public class StockDetailActivity extends AppCompatActivity{
         c.add(Calendar.DATE,4);
         endDate = df.format(c.getTime());
         Log.d(TAG, "Start Date : " + startDate + "    " + "End Date : " + endDate );
+    }
+
+    private void PastThirty(){
+        Calendar c = Calendar.getInstance();
+        DateFormat df = new SimpleDateFormat("yyyy-MM-dd",Locale.getDefault());
+        today_date = df.format(c.getTime());
+        c.add(Calendar.DATE,-30);
+        past_thirty = df.format(c.getTime());
+        Log.d(TAG, "PastThirty: Today's date " + today_date + " thirty days ago " + past_thirty);
     }
 }
 

@@ -48,7 +48,6 @@ public class LineCardOne {
         }
 
 
-
     }
 
     public void show(){

@@ -21,4 +21,34 @@
 
     </android.support.v7.widget.CardView>
 
+    <android.support.v7.widget.CardView
+        android:id="@+id/monthly_card"
+        android:layout_width="match_parent"
+        android:layout_height="250dp"
+        app:cardCornerRadius="4dp"
+        android:layout_margin="5dp"
+        app:cardBackgroundColor="@color/monthly_card_background">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="top|right"
+                android:text="@string/monthly_chart_header"
+                android:layout_margin="12dp"
+                android:drawableLeft="@drawable/oval_point"
+                android:drawablePadding="4dp"
+                android:textStyle="bold"/>
+            <com.db.chart.view.LineChartView
+                android:id="@+id/monthly_line_chart"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_margin="16dp"
+                app:chart_axisColor="#30547d99"/>
+        </LinearLayout>
+
+    </android.support.v7.widget.CardView>
+
 </LinearLayout>
