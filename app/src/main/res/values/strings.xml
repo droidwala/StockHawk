@@ -14,5 +14,6 @@
   <string name="fab_btn_description" translatable="false">Search Stock by name </string>
   <string name="monthly_chart_header">Past 30 days</string>
   <string name="sixty_chart_header">Past 60 days</string>
+  <string name="weekly_chart_header">Current Week</string>
 
 </resources>

@@ -5,16 +5,15 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.widget.ArrayAdapter;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.sam_chordas.android.stockhawk.R;
-import com.sam_chordas.android.stockhawk.charts.LineCardOne;
+import com.sam_chordas.android.stockhawk.charts.BarCardOne;
 import com.sam_chordas.android.stockhawk.charts.LineCardThree;
 import com.sam_chordas.android.stockhawk.charts.LineCardTwo;
-import com.sam_chordas.android.stockhawk.charts.MPLineChart;
 import com.sam_chordas.android.stockhawk.pojo.History;
+import com.sam_chordas.android.stockhawk.pojo.OneDayHistory;
 import com.squareup.okhttp.Callback;
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
@@ -39,6 +38,7 @@ public class StockDetailActivity extends AppCompatActivity{
     private String stock_name;
     private Toolbar toolbar;
 
+    ArrayList<String> weekly_close_amt = new ArrayList<String>();
      ArrayList<String> monthly_close_amt = new ArrayList<String>();
      ArrayList<String> monthly_dates = new ArrayList<String>();
 
@@ -76,14 +76,14 @@ public class StockDetailActivity extends AppCompatActivity{
         }
 
         try {
-            FetchData(urlString.toString());
+            FetchWeeklyData(urlString.toString());
         } catch (IOException e) {
             e.printStackTrace();
         }
 
     }
 
-    public void FetchData(String URL) throws IOException{
+    public void FetchWeeklyData(String URL) throws IOException{
          Request request = new Request.Builder()
                   .url(URL).build();
 
@@ -95,20 +95,46 @@ public class StockDetailActivity extends AppCompatActivity{
 
             @Override
             public void onResponse(Response response) throws IOException {
-                //Log.d(TAG, "onResponse: called " + response.body().string());
-                Gson gson = new Gson();
-                History history = gson.fromJson(response.body().string(),new TypeToken<History>(){}.getType());
-                if(history.getQuery().getResults()!= null) {
-                    ArrayList<History.QueryEntity.ResultsEntity.QuoteEntity> quotes = (ArrayList<History.QueryEntity.ResultsEntity.QuoteEntity>) history.getQuery().getResults().getQuote();
+                Log.d(TAG, "Dates : " + " Start Date " + startDate +  " End Date " + endDate);
+            //    Log.d(TAG, "Weekly Data " + response.body().string());
+                if(!checkIfTuesday()) {
+                    Gson gson = new Gson();
+                    History history = gson.fromJson(response.body().string(), new TypeToken<History>() {
+                    }.getType());
+                    if (history.getQuery().getResults() != null) {
+                        ArrayList<History.QueryEntity.ResultsEntity.QuoteEntity> quotes = (ArrayList<History.QueryEntity.ResultsEntity.QuoteEntity>) history.getQuery().getResults().getQuote();
 
-                    Log.d(TAG, "onResponse: after parsing " + String.valueOf(quotes.size()));
-                    final ArrayList<String> close_amt = new ArrayList<String>();
-                    for (int i = 0; i < quotes.size(); i++) {
-                        close_amt.add(quotes.get(i).getAdj_Close());
+                        Log.d(TAG, "onResponse: after parsing " + String.valueOf(quotes.size()));
+
+                        for (int i = 0; i < quotes.size(); i++) {
+                            weekly_close_amt.add(quotes.get(i).getAdj_Close());
+                        }
+                        Log.d(TAG, "Weekly Amt Size : before for loop " + String.valueOf(weekly_close_amt.size()));
+                        if(weekly_close_amt.size() < 5) {
+                            for (int j = weekly_close_amt.size(); j < 5; j++) {
+                                weekly_close_amt.add("0");
+                            }
+                        }
+                        Log.d(TAG, "Weekly Amt Size : after for loop " + String.valueOf(weekly_close_amt.size()));
+                    } else {
+                        Log.d(TAG, "onResponse: No data!!");
                     }
                 }
                 else{
-                    Log.d(TAG, "onResponse: No data!!" );
+                    Log.d(TAG, "onResponse: LOL! Aaj tuesday hai!");
+                    Gson gson = new Gson();
+                    OneDayHistory oneDayHistory = gson.fromJson(response.body().string(),new TypeToken<OneDayHistory>(){}.getType());
+                    if(oneDayHistory.getQuery().getResults()!=null){
+                        OneDayHistory.QueryEntity.ResultsEntity.QuoteEntity quote = oneDayHistory.getQuery().getResults().getQuote();
+                        weekly_close_amt.add(quote.getAdj_Close());
+                    }
+                    if(weekly_close_amt.size() < 5) {
+                        for (int j = weekly_close_amt.size(); j < 5; j++) {
+                            weekly_close_amt.add("0");
+                        }
+                    }
+
+                    Log.d(TAG, "weekly close array size : " + String.valueOf(weekly_close_amt.size()));
                 }
 
                 runOnUiThread(new Runnable() {
@@ -142,6 +168,14 @@ public class StockDetailActivity extends AppCompatActivity{
 
     }
 
+    private boolean checkIfTuesday(){
+        Calendar c = Calendar.getInstance();
+        if(c.get(Calendar.DAY_OF_WEEK) == Calendar.TUESDAY)
+            return true;
+        else
+            return false;
+    }
+    
     private void FetchMonthlyData(String url) throws IOException{
 
         Request request = new Request.Builder()
@@ -255,10 +289,9 @@ public class StockDetailActivity extends AppCompatActivity{
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
+                            new BarCardOne((CardView)findViewById(R.id.weekly_card),StockDetailActivity.this,weekly_close_amt).show();
                             new LineCardTwo((CardView) findViewById(R.id.monthly_card), StockDetailActivity.this, monthly_close_amt, monthly_dates).show();
                             new LineCardThree((CardView) findViewById(R.id.sixty_days_card), StockDetailActivity.this, sixty_close_amt, sixty_dates).show();
-
-                            // new MPLineChart((CardView)findViewById(R.id.monthly_card),StockDetailActivity.this,monthly_close_amt).show();
                         }
                     });
                 } else {
@@ -276,6 +309,7 @@ public class StockDetailActivity extends AppCompatActivity{
         startDate = df.format(c.getTime());
         c.add(Calendar.DATE,4);
         endDate = df.format(c.getTime());
+
         Log.d(TAG, "Start Date : " + startDate + "    " + "End Date : " + endDate);
     }
 

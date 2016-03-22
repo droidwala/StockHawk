@@ -33,12 +33,27 @@
                 android:layout_margin="5dp"
                 app:cardCornerRadius="4dp"
                 app:cardBackgroundColor="@color/weekly_card_background">
-                <com.db.chart.view.LineChartView
-                    android:id="@+id/weekly_bar_chart"
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:layout_margin="16dp"
-                    app:chart_fontSize="16sp"/>
+                    android:orientation="vertical">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="top|right"
+                        android:text="@string/weekly_chart_header"
+                        android:layout_margin="12dp"
+                        android:drawableLeft="@drawable/point_green"
+                        android:drawablePadding="4dp"
+                        android:textColor="@color/colorWhite"
+                        android:textStyle="bold"/>
+                    <com.db.chart.view.BarChartView
+                        android:id="@+id/weekly_bar_chart"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_margin="16dp"
+                        app:chart_axisColor="#30547d99"/>
+                </LinearLayout>
 
             </android.support.v7.widget.CardView>
             <android.support.v7.widget.CardView
@@ -58,7 +73,7 @@
                         android:layout_gravity="top|right"
                         android:text="@string/monthly_chart_header"
                         android:layout_margin="12dp"
-                        android:drawableLeft="@drawable/oval_point"
+                        android:drawableLeft="@drawable/point_yellow"
                         android:drawablePadding="4dp"
                         android:textColor="@color/colorWhite"
                         android:textStyle="bold"/>
@@ -88,7 +103,7 @@
                         android:layout_gravity="top|right"
                         android:text="@string/sixty_chart_header"
                         android:layout_margin="12dp"
-                        android:drawableLeft="@drawable/oval_point"
+                        android:drawableLeft="@drawable/point_red"
                         android:drawablePadding="4dp"
                         android:textStyle="bold"/>
                     <com.db.chart.view.LineChartView
@@ -97,6 +112,41 @@
                         android:layout_height="match_parent"
                         android:layout_margin="16dp"
                         app:chart_axisColor="#30547d99"/>
+                </LinearLayout>
+            </android.support.v7.widget.CardView>
+            <android.support.v7.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="200dp"
+                app:cardCornerRadius="4dp"
+                android:layout_margin="5dp"
+                app:cardBackgroundColor="@color/colorWhite">
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical">
+                    <TextView
+                        android:id="@+id/custom_report_txt"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="20dp"
+                        android:layout_gravity="center_horizontal|center_vertical"
+                        android:textColor="@color/color_black"
+                        android:text="Looking for custom report \n"
+                        android:textSize="18sp"
+                        android:textStyle="bold"
+                        />
+                    <Button
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/custom_report_btn"
+                        android:text="Create Report"
+                        android:layout_gravity="center_horizontal"
+                        android:textColor="@color/colorWhite"
+                        android:layout_centerHorizontal="true"
+                        android:layout_marginTop="10dp"
+                        android:padding="5dp"
+                        android:textStyle="bold"
+                        />
                 </LinearLayout>
             </android.support.v7.widget.CardView>
         </LinearLayout>
