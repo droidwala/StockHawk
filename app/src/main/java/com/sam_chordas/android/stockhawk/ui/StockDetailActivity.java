@@ -7,6 +7,10 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import com.google.gson.JsonPrimitive;
 import com.google.gson.reflect.TypeToken;
 import com.sam_chordas.android.stockhawk.R;
 import com.sam_chordas.android.stockhawk.charts.BarCardOne;
@@ -18,6 +22,9 @@ import com.squareup.okhttp.Callback;
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
 import com.squareup.okhttp.Response;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -95,11 +102,21 @@ public class StockDetailActivity extends AppCompatActivity{
 
             @Override
             public void onResponse(Response response) throws IOException {
-                Log.d(TAG, "Dates : " + " Start Date " + startDate +  " End Date " + endDate);
-            //    Log.d(TAG, "Weekly Data " + response.body().string());
-                if(!checkIfTuesday()) {
+                Log.d(TAG, "Dates : " + " Start Date " + startDate + " End Date " + endDate);
+                //    Log.d(TAG, "Weekly Data " + response.body().string());
+                String result = response.body().string();
+
+                JsonParser parser = new JsonParser();
+                JsonObject object = parser.parse(result).getAsJsonObject();
+                JsonObject query = object.getAsJsonObject("query");
+                JsonPrimitive count = query.getAsJsonPrimitive("count");
+                int result_count = count.getAsInt();
+                Log.d(TAG, "count value is : " + String.valueOf(result_count));
+
+
+                if (result_count > 1) {
                     Gson gson = new Gson();
-                    History history = gson.fromJson(response.body().string(), new TypeToken<History>() {
+                    History history = gson.fromJson(result, new TypeToken<History>() {
                     }.getType());
                     if (history.getQuery().getResults() != null) {
                         ArrayList<History.QueryEntity.ResultsEntity.QuoteEntity> quotes = (ArrayList<History.QueryEntity.ResultsEntity.QuoteEntity>) history.getQuery().getResults().getQuote();
@@ -110,7 +127,7 @@ public class StockDetailActivity extends AppCompatActivity{
                             weekly_close_amt.add(quotes.get(i).getAdj_Close());
                         }
                         Log.d(TAG, "Weekly Amt Size : before for loop " + String.valueOf(weekly_close_amt.size()));
-                        if(weekly_close_amt.size() < 5) {
+                        if (weekly_close_amt.size() < 5) {
                             for (int j = weekly_close_amt.size(); j < 5; j++) {
                                 weekly_close_amt.add("0");
                             }
@@ -120,21 +137,25 @@ public class StockDetailActivity extends AppCompatActivity{
                         Log.d(TAG, "onResponse: No data!!");
                     }
                 }
-                else{
-                    Log.d(TAG, "onResponse: LOL! Aaj tuesday hai!");
+                else if (result_count == 1) {
+                    Log.d(TAG, "onResponse: one result case!");
                     Gson gson = new Gson();
-                    OneDayHistory oneDayHistory = gson.fromJson(response.body().string(),new TypeToken<OneDayHistory>(){}.getType());
-                    if(oneDayHistory.getQuery().getResults()!=null){
+                    OneDayHistory oneDayHistory = gson.fromJson(result, new TypeToken<OneDayHistory>() {
+                    }.getType());
+                    if (oneDayHistory.getQuery().getResults() != null) {
                         OneDayHistory.QueryEntity.ResultsEntity.QuoteEntity quote = oneDayHistory.getQuery().getResults().getQuote();
                         weekly_close_amt.add(quote.getAdj_Close());
                     }
-                    if(weekly_close_amt.size() < 5) {
+                    if (weekly_close_amt.size() < 5) {
                         for (int j = weekly_close_amt.size(); j < 5; j++) {
                             weekly_close_amt.add("0");
                         }
                     }
 
                     Log.d(TAG, "weekly close array size : " + String.valueOf(weekly_close_amt.size()));
+                }
+                else {
+                    Log.d(TAG, "NO DATA FOR CURRENT WEEK BRO!!");
                 }
 
                 runOnUiThread(new Runnable() {
@@ -145,10 +166,10 @@ public class StockDetailActivity extends AppCompatActivity{
                         StringBuilder urlString = new StringBuilder();
                         urlString.append(BASE_URL);
                         try {
-                            urlString.append(URLEncoder.encode("select * from yahoo.finance.historicaldata where symbol = ","UTF-8"));
-                            urlString.append(URLEncoder.encode("\"" + stock_name + "\"","UTF-8"));
-                            urlString.append(URLEncoder.encode(" and startDate = " + "\"" + past_thirty + "\"","UTF-8"));
-                            urlString.append(URLEncoder.encode(" and endDate = " + "\"" + today_date + "\"","UTF-8"));
+                            urlString.append(URLEncoder.encode("select * from yahoo.finance.historicaldata where symbol = ", "UTF-8"));
+                            urlString.append(URLEncoder.encode("\"" + stock_name + "\"", "UTF-8"));
+                            urlString.append(URLEncoder.encode(" and startDate = " + "\"" + past_thirty + "\"", "UTF-8"));
+                            urlString.append(URLEncoder.encode(" and endDate = " + "\"" + today_date + "\"", "UTF-8"));
                             urlString.append("&format=json&diagnostics=true&env=store%3A%2F%2Fdatatables.org%2Falltableswithkeys&callback=");
 
                         } catch (UnsupportedEncodingException e) {
@@ -168,13 +189,6 @@ public class StockDetailActivity extends AppCompatActivity{
 
     }
 
-    private boolean checkIfTuesday(){
-        Calendar c = Calendar.getInstance();
-        if(c.get(Calendar.DAY_OF_WEEK) == Calendar.TUESDAY)
-            return true;
-        else
-            return false;
-    }
     
     private void FetchMonthlyData(String url) throws IOException{
 
@@ -309,7 +323,6 @@ public class StockDetailActivity extends AppCompatActivity{
         startDate = df.format(c.getTime());
         c.add(Calendar.DATE,4);
         endDate = df.format(c.getTime());
-
         Log.d(TAG, "Start Date : " + startDate + "    " + "End Date : " + endDate);
     }
 
