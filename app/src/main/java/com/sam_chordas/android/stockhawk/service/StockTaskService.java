@@ -32,6 +32,7 @@ import java.util.ArrayList;
  * and is used for the initialization and adding task as well.
  */
 public class StockTaskService extends GcmTaskService{
+
   private static final String TAG = "StockTaskService";
   private static final int NO_STOCK_FOUND = 5;
   private static final int SERVER_ISSUE = 6;
@@ -62,7 +63,7 @@ public class StockTaskService extends GcmTaskService{
 
   @Override
   public int onRunTask(TaskParams params){
-    Cursor initQueryCursor;
+    Cursor initQueryCursor = null;
     if (mContext == null){
       mContext = this;
     }
@@ -135,19 +136,17 @@ public class StockTaskService extends GcmTaskService{
           batchOperations = Utils.quoteJsonToContentVals(getResponse);
           if(batchOperations!=null && batchOperations.size()>0) {
             Log.d(TAG, "Response Result : Not null");
-            ContentValues contentValues = new ContentValues();
-            // update ISCURRENT to 0 (false) so new data is current
+            // No more is_Current column logic
             if (isUpdate) {
-              contentValues.put(QuoteColumns.ISCURRENT, 0);
-              mContext.getContentResolver().update(QuoteProvider.Quotes.CONTENT_URI, contentValues,
-                      null, null);
                 result = UPDATING_EXISTING;
+                mContext.getContentResolver().delete(QuoteProvider.Quotes.CONTENT_URI,null,null);
             }
             else{
                 result = NEW_STOCK_ADDED;
             }
-            mContext.getContentResolver().applyBatch(QuoteProvider.AUTHORITY,
-                    batchOperations);
+
+              mContext.getContentResolver().applyBatch(QuoteProvider.AUTHORITY,
+                      batchOperations);
 
 
           }

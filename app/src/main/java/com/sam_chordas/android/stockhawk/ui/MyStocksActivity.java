@@ -260,11 +260,13 @@ public class MyStocksActivity extends AppCompatActivity implements LoaderManager
   @Override
   public Loader<Cursor> onCreateLoader(int id, Bundle args){
     // This narrows the return to only the stocks that are most current.
+      //Since we aren't building history data ourself locally but relying on historical table
+      // we will only keep single records  of all the stocks in the table(so removing is_Current column from table)
     return new CursorLoader(this, QuoteProvider.Quotes.CONTENT_URI,
         new String[]{ QuoteColumns._ID, QuoteColumns.SYMBOL, QuoteColumns.BIDPRICE,
             QuoteColumns.PERCENT_CHANGE, QuoteColumns.CHANGE, QuoteColumns.ISUP},
-        QuoteColumns.ISCURRENT + " = ?",
-        new String[]{"1"},
+        null,
+        null,
         null);
   }
 

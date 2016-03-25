@@ -3,14 +3,20 @@ package com.sam_chordas.android.stockhawk.widget;
 import android.appwidget.AppWidgetManager;
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
+import android.util.Log;
 import android.widget.RemoteViews;
 import android.widget.RemoteViewsService;
 
 import com.sam_chordas.android.stockhawk.R;
+import com.sam_chordas.android.stockhawk.data.QuoteColumns;
+import com.sam_chordas.android.stockhawk.data.QuoteProvider;
 
 public class StockViewsFactory implements RemoteViewsService.RemoteViewsFactory {
 
-    private static final String[] items = {"GOOG","FB","TWTR","ARP","MCD"};
+    private static final String TAG = "StockViewsFactory";
+    private Cursor mCursor;
+    private static String[] symbols;
     private int appWidgetId;
     private Context mContext;
     public StockViewsFactory(Context context, Intent intent){
@@ -20,28 +26,52 @@ public class StockViewsFactory implements RemoteViewsService.RemoteViewsFactory 
     @Override
     public void onCreate() {
        //do nothing
+        Log.d(TAG, "onCreate: called");
     }
 
     @Override
     public void onDataSetChanged() {
+        Log.d(TAG, "onDataSetChanged: called");
+        if(mCursor!=null)
+            mCursor.close();
+
+        mCursor = mContext.getContentResolver().query(QuoteProvider.Quotes.CONTENT_URI,
+                new String[]{QuoteColumns.SYMBOL},
+                null,
+                null,
+                null);
+        symbols = new String[mCursor.getCount()];
+        Log.d(TAG, "onDataSetChanged: Cursor Count " + String.valueOf(symbols.length));
+        try{
+            while(mCursor.moveToNext()){
+                Log.d(TAG, "onDataSetChanged: cursor parsing " + String.valueOf(mCursor.getPosition()));
+                symbols[mCursor.getPosition()] = mCursor.getString(mCursor.getColumnIndex(QuoteColumns.SYMBOL));
+            }
+        }
+        finally {
+            if(mCursor!=null)
+                mCursor.close();
+        }
+
 
     }
 
     @Override
     public void onDestroy() {
       //do nothing
+        Log.d(TAG, "onDestroy: called ");
     }
 
     @Override
     public int getCount() {
-        return items.length;
+        return symbols.length;
     }
 
     @Override
     public RemoteViews getViewAt(int position) {
         RemoteViews remoteViews  = new RemoteViews(mContext.getPackageName(), R.layout.widget_collection_item);
 
-        remoteViews.setTextViewText(R.id.stock_symbol_row,items[position]);
+        remoteViews.setTextViewText(R.id.stock_symbol_row,symbols[position]);
 
         return remoteViews;
     }
