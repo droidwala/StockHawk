@@ -63,7 +63,7 @@ public class StockTaskService extends GcmTaskService{
 
   @Override
   public int onRunTask(TaskParams params){
-    Cursor initQueryCursor = null;
+    Cursor initQueryCursor;
     if (mContext == null){
       mContext = this;
     }
@@ -89,7 +89,8 @@ public class StockTaskService extends GcmTaskService{
         } catch (UnsupportedEncodingException e) {
           e.printStackTrace();
         }
-      } else if (initQueryCursor != null){
+      }
+      else if (initQueryCursor != null){
         DatabaseUtils.dumpCursor(initQueryCursor);
         initQueryCursor.moveToFirst();
         for (int i = 0; i < initQueryCursor.getCount(); i++){
@@ -102,6 +103,10 @@ public class StockTaskService extends GcmTaskService{
           urlStringBuilder.append(URLEncoder.encode(mStoredSymbols.toString(), "UTF-8"));
         } catch (UnsupportedEncodingException e) {
           e.printStackTrace();
+        }
+        finally {
+            if(initQueryCursor!=null)
+            initQueryCursor.close();
         }
       }
     }
@@ -138,6 +143,7 @@ public class StockTaskService extends GcmTaskService{
             Log.d(TAG, "Response Result : Not null");
             // No more is_Current column logic
             if (isUpdate) {
+                Log.d(TAG, "Deleting Existing Stock to avoid duplicates");
                 result = UPDATING_EXISTING;
                 mContext.getContentResolver().delete(QuoteProvider.Quotes.CONTENT_URI,null,null);
             }
@@ -147,8 +153,6 @@ public class StockTaskService extends GcmTaskService{
 
               mContext.getContentResolver().applyBatch(QuoteProvider.AUTHORITY,
                       batchOperations);
-
-
           }
           else{
             if(isSuccessful) {

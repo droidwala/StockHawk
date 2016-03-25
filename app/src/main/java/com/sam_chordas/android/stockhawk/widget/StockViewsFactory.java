@@ -17,6 +17,9 @@ public class StockViewsFactory implements RemoteViewsService.RemoteViewsFactory 
     private static final String TAG = "StockViewsFactory";
     private Cursor mCursor;
     private static String[] symbols;
+    private static String[] percent_changes;
+    private static String[] bid_prices;
+
     private int appWidgetId;
     private Context mContext;
     public StockViewsFactory(Context context, Intent intent){
@@ -36,20 +39,27 @@ public class StockViewsFactory implements RemoteViewsService.RemoteViewsFactory 
             mCursor.close();
 
         mCursor = mContext.getContentResolver().query(QuoteProvider.Quotes.CONTENT_URI,
-                new String[]{QuoteColumns.SYMBOL},
+                new String[]{QuoteColumns.SYMBOL,QuoteColumns.BIDPRICE,QuoteColumns.PERCENT_CHANGE},
                 null,
                 null,
                 null);
-        symbols = new String[mCursor.getCount()];
+
+        int count = mCursor.getCount();
+        symbols = new String[count];
+        bid_prices = new String[count];
+        percent_changes = new String[count];
+
         Log.d(TAG, "onDataSetChanged: Cursor Count " + String.valueOf(symbols.length));
         try{
             while(mCursor.moveToNext()){
                 Log.d(TAG, "onDataSetChanged: cursor parsing " + String.valueOf(mCursor.getPosition()));
-                symbols[mCursor.getPosition()] = mCursor.getString(mCursor.getColumnIndex(QuoteColumns.SYMBOL));
+                int pos = mCursor.getPosition();
+                symbols[pos] = mCursor.getString(mCursor.getColumnIndex(QuoteColumns.SYMBOL));
+                bid_prices[pos] = mCursor.getString(mCursor.getColumnIndex(QuoteColumns.BIDPRICE));
+                percent_changes[pos] = mCursor.getString(mCursor.getColumnIndex(QuoteColumns.PERCENT_CHANGE));
             }
         }
         finally {
-            if(mCursor!=null)
                 mCursor.close();
         }
 
@@ -71,7 +81,9 @@ public class StockViewsFactory implements RemoteViewsService.RemoteViewsFactory 
     public RemoteViews getViewAt(int position) {
         RemoteViews remoteViews  = new RemoteViews(mContext.getPackageName(), R.layout.widget_collection_item);
 
-        remoteViews.setTextViewText(R.id.stock_symbol_row,symbols[position]);
+        remoteViews.setTextViewText(R.id.stock_symbol_row_widget,symbols[position]);
+        remoteViews.setTextViewText(R.id.bid_price_row_widget,bid_prices[position]);
+        remoteViews.setTextViewText(R.id.change_row_widget,percent_changes[position]);
 
         return remoteViews;
     }

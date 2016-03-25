@@ -46,6 +46,10 @@
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE"/>
                 <action android:name="android.appwiget.action.APPWIDGET_ENABLED"/>
                 <action android:name="android.appwidget.action.APPWIDGET_OPTIONS_CHANGED"/>
+                <action android:name="com.sam_chordas.android.stockhawk.stock_added"/>
+                <action android:name="com.sam_chordas.android.stockhawk.stock_updated"/>
+                <action android:name="com.sam_chordas.android.stockhawk.stock_removed"/>
+                <action android:name="com.sam_chordas.android.stockhawk.alarm_update"/>
             </intent-filter>
             <meta-data android:name="android.appwidget.provider"
                 android:resource="@xml/widget_info"/>

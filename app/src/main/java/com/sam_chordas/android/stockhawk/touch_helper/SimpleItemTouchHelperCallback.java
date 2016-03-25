@@ -1,7 +1,10 @@
 package com.sam_chordas.android.stockhawk.touch_helper;
 
+import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
+
+import com.sam_chordas.android.stockhawk.widget.QuoteWidgetProvider;
 
 /**
  * Created by sam_chordas on 10/6/15.

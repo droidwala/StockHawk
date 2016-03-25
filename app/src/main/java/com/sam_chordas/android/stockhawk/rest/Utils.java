@@ -25,8 +25,6 @@ public class Utils {
 
   public static ArrayList quoteJsonToContentVals(String JSON){
     ArrayList<ContentProviderOperation> batchOperations = new ArrayList<>();
-    ArrayList<String> noStockFound = new ArrayList<String>();
-    ArrayList<String> tryAgain = new ArrayList<String>();
     JSONObject jsonObject = null;
     JSONArray resultsArray = null;
     Log.i(LOG_TAG, "GET FB: " + JSON);

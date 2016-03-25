@@ -40,6 +40,7 @@ import com.google.android.gms.gcm.PeriodicTask;
 import com.google.android.gms.gcm.Task;
 import com.melnykov.fab.FloatingActionButton;
 import com.sam_chordas.android.stockhawk.touch_helper.SimpleItemTouchHelperCallback;
+import com.sam_chordas.android.stockhawk.widget.QuoteWidgetProvider;
 
 public class MyStocksActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor>,View.OnClickListener{
 
@@ -133,6 +134,8 @@ public class MyStocksActivity extends AppCompatActivity implements LoaderManager
                     mServiceIntent.putExtra("symbol", input.toString());
                     startService(mServiceIntent);
                   }
+                    if(c!=null)
+                        c.close();
                 }
               })
               .show();
@@ -307,7 +310,13 @@ public class MyStocksActivity extends AppCompatActivity implements LoaderManager
             }
             else if(intent.getIntExtra("RESULT",99) == 7){
                 Log.d(TAG, "New Stock added: Count " + String.valueOf(mCursorAdapter.getItemCount()));
-               recyclerView.smoothScrollToPosition(mCursorAdapter.getItemCount());
+                recyclerView.smoothScrollToPosition(mCursorAdapter.getItemCount());
+                Intent i = new Intent(QuoteWidgetProvider.STOCK_ADDED_INTENT);
+                sendBroadcast(i);
+            }
+            else if(intent.getIntExtra("RESULT",99) == 10){
+                Intent i = new Intent(QuoteWidgetProvider.STOCK_UPDATED_INTENT);
+                sendBroadcast(i);
             }
 
         }
