@@ -5,6 +5,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.View;
+import android.widget.TextView;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
@@ -52,12 +54,14 @@ public class StockDetailActivity extends AppCompatActivity{
     ArrayList<String> sixty_close_amt = new ArrayList<String>();
     ArrayList<String> sixty_dates = new ArrayList<String>();
 
+    TextView no_weekly_data;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.stock_detail);
         toolbar = (Toolbar) findViewById(R.id.toolbar);
+        no_weekly_data = (TextView) findViewById(R.id.no_weekly_data);
         setSupportActionBar(toolbar);
 
         Bundle b = getIntent().getExtras();
@@ -111,7 +115,7 @@ public class StockDetailActivity extends AppCompatActivity{
                 JsonObject query = object.getAsJsonObject("query");
                 JsonPrimitive count = query.getAsJsonPrimitive("count");
                 int result_count = count.getAsInt();
-                Log.d(TAG, "count value is : " + String.valueOf(result_count));
+                Log.d(TAG, "Weekly count value is : " + String.valueOf(result_count));
 
 
                 if (result_count > 1) {
@@ -165,8 +169,6 @@ public class StockDetailActivity extends AppCompatActivity{
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        //(new LineCardOne((CardView)findViewById(R.id.weekly_card),StockDetailActivity.this,close_amt)).show();
-
                         StringBuilder urlString = new StringBuilder();
                         urlString.append(BASE_URL);
                         try {
@@ -307,7 +309,12 @@ public class StockDetailActivity extends AppCompatActivity{
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            new BarCardOne((CardView)findViewById(R.id.weekly_card),StockDetailActivity.this,weekly_close_amt).show();
+                            if(weekly_close_amt.size()>0) {
+                                new BarCardOne((CardView) findViewById(R.id.weekly_card), StockDetailActivity.this, weekly_close_amt).show();
+                            }else{
+                                no_weekly_data.setVisibility(View.VISIBLE);
+                            }
+
                             new LineCardTwo((CardView) findViewById(R.id.monthly_card), StockDetailActivity.this, monthly_close_amt, monthly_dates).show();
                             new LineCardThree((CardView) findViewById(R.id.sixty_days_card), StockDetailActivity.this, sixty_close_amt, sixty_dates).show();
                         }

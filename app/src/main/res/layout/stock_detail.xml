@@ -33,10 +33,11 @@
                 android:layout_margin="5dp"
                 app:cardCornerRadius="4dp"
                 app:cardBackgroundColor="@color/weekly_card_background">
-                <LinearLayout
+                <FrameLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:orientation="vertical">
+                    android:orientation="vertical"
+                    xmlns:tools="http://schemas.android.com/tools">
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -53,7 +54,19 @@
                         android:layout_height="match_parent"
                         android:layout_margin="16dp"
                         app:chart_axisColor="#30547d99"/>
-                </LinearLayout>
+                    <TextView
+                        android:id="@+id/no_weekly_data"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:text="@string/no_weekly_data"
+                        android:textColor="@color/color_white"
+                        android:textSize="15sp"
+                        android:textStyle="bold"
+                        android:visibility="invisible"
+                        tools:visibility="visible"
+                        tools:text="No Data"/>
+                </FrameLayout>
 
             </android.support.v7.widget.CardView>
             <android.support.v7.widget.CardView
