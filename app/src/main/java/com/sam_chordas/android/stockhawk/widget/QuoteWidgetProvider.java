@@ -1,5 +1,6 @@
 package com.sam_chordas.android.stockhawk.widget;
 
+import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
 import android.content.ComponentName;
@@ -20,13 +21,20 @@ public class QuoteWidgetProvider extends AppWidgetProvider {
     public static final String STOCK_UPDATED_INTENT = "com.sam_chordas.android.stockhawk.stock_updated";
     public static final String STOCK_REMOVED_INTENT = "com.sam_chordas.android.stockhawk.stock_removed";
     public static final String ALARM_UPDATE = "com.sam_chordas.android.stockhawk.alarm_update";
+    public static final String INTERVAL_CHANGE = "com.sam_chordas.android.stockhawk.interval_change";
 
     @Override
     public void onReceive(Context context, Intent intent) {
+        Log.d(TAG, "onReceive: " + intent.getAction());
         if(intent.getAction() == STOCK_ADDED_INTENT || intent.getAction() == STOCK_UPDATED_INTENT
                 || intent.getAction() == STOCK_REMOVED_INTENT || intent.getAction() == ALARM_UPDATE){
-            Log.d(TAG, "onReceive: called " + "YUP I HEARD THAT!");
             onUpdate(context);
+        }
+        else if(intent.getAction()==INTERVAL_CHANGE){
+            Bundle b = intent.getExtras();
+            long interval = b.getLong("Interval");
+            Log.d(TAG, "onReceive: " + String.valueOf(interval));
+            onUpdate(context,interval);
         }
         else{
             super.onReceive(context, intent);
@@ -43,6 +51,12 @@ public class QuoteWidgetProvider extends AppWidgetProvider {
         }
     }
 
+    private void onUpdate(Context context,long interval){
+        Log.d(TAG, "Interval Settings Changed" + String.valueOf(interval));
+        AlarmUtil.scheduleUpdate(context,interval);
+    }
+
+
     @Override
     public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
         Log.d(TAG, "Widget is getting updated.Please take your seats!!");
@@ -54,8 +68,11 @@ public class QuoteWidgetProvider extends AppWidgetProvider {
 
             RemoteViews widget = new RemoteViews(context.getPackageName(),R.layout.widget_collection);
 
-            widget.setRemoteAdapter(R.id.widget_list,svcIntent);
+            widget.setRemoteAdapter(R.id.widget_list, svcIntent);
 
+            Intent settings = new Intent(context,IntervalSettingsActivity.class);
+            PendingIntent pi = PendingIntent.getActivity(context,0,settings,0);
+            widget.setOnClickPendingIntent(R.id.settings_btn,pi);
             Log.d(TAG, "Before UpdateAppWidget Call ");
             appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetIds[i],R.id.widget_list);
             appWidgetManager.updateAppWidget(appWidgetIds[i], widget);

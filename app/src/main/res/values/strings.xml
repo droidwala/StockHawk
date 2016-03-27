@@ -12,4 +12,11 @@
   <string name="widget_title">Today\'s Market</string>
   <string name="network_toast">Uh-oh! This app requires an internet connection</string>
   <string name="fab_btn_description" translatable="false">Search Stock by name </string>
+
+  <string-array name="intervals">
+    <item>5 minutes</item>
+    <item>15 minutes(Default)</item>
+    <item>30 minutes</item>
+    <item>1 hour</item>
+  </string-array>
 </resources>
