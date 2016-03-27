@@ -58,16 +58,16 @@ public class QuoteCursorAdapter extends CursorRecyclerViewAdapter<QuoteCursorAda
         viewHolder.change.setBackgroundDrawable(
             mContext.getResources().getDrawable(R.drawable.percent_change_pill_green));
       }else {
-        viewHolder.change.setBackground(
-            mContext.getResources().getDrawable(R.drawable.percent_change_pill_green));
+        viewHolder.change.setBackgroundDrawable(
+                mContext.getResources().getDrawable(R.drawable.percent_change_pill_green));
       }
     } else{
       if (sdk < Build.VERSION_CODES.JELLY_BEAN) {
         viewHolder.change.setBackgroundDrawable(
             mContext.getResources().getDrawable(R.drawable.percent_change_pill_red));
       } else{
-        viewHolder.change.setBackground(
-            mContext.getResources().getDrawable(R.drawable.percent_change_pill_red));
+        viewHolder.change.setBackgroundDrawable(
+                mContext.getResources().getDrawable(R.drawable.percent_change_pill_red));
       }
     }
     if (Utils.showPercent){
@@ -91,7 +91,7 @@ public class QuoteCursorAdapter extends CursorRecyclerViewAdapter<QuoteCursorAda
   }
 
   public static class ViewHolder extends RecyclerView.ViewHolder
-      implements ItemTouchHelperViewHolder, View.OnClickListener{
+      implements ItemTouchHelperViewHolder{
     public final TextView symbol;
     public final TextView bidPrice;
     public final TextView change;
@@ -104,8 +104,8 @@ public class QuoteCursorAdapter extends CursorRecyclerViewAdapter<QuoteCursorAda
     }
 
     @Override
-    public void onItemSelected(){
-      itemView.setBackgroundColor(Color.LTGRAY);
+    public void onItemSelected() {
+      //do nothing
     }
 
     @Override
@@ -115,9 +115,5 @@ public class QuoteCursorAdapter extends CursorRecyclerViewAdapter<QuoteCursorAda
       mContext.sendBroadcast(swipe_intent);
     }
 
-    @Override
-    public void onClick(View v) {
-
-    }
   }
 }
