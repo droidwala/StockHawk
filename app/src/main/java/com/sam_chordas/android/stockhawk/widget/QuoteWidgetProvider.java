@@ -19,7 +19,7 @@ public class QuoteWidgetProvider extends AppWidgetProvider {
     public static final String STOCK_ADDED_INTENT = "com.sam_chordas.android.stockhawk.stock_added";
     public static final String STOCK_UPDATED_INTENT = "com.sam_chordas.android.stockhawk.stock_updated";
     public static final String STOCK_REMOVED_INTENT = "com.sam_chordas.android.stockhawk.stock_removed";
-    public static final String ALARM_UPDATE ="com.sam_chordas.android.stockhawk.alarm_update";
+    public static final String ALARM_UPDATE = "com.sam_chordas.android.stockhawk.alarm_update";
 
     @Override
     public void onReceive(Context context, Intent intent) {
@@ -37,7 +37,10 @@ public class QuoteWidgetProvider extends AppWidgetProvider {
         AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
         ComponentName componentName = new ComponentName(context.getPackageName(),getClass().getName());
         int[] appWidgetIds = appWidgetManager.getAppWidgetIds(componentName);
-        onUpdate(context,appWidgetManager,appWidgetIds);
+        if(appWidgetIds.length>0) {
+            Log.d(TAG, "Appwidget greater than 0");
+            onUpdate(context, appWidgetManager, appWidgetIds);
+        }
     }
 
     @Override
@@ -59,11 +62,7 @@ public class QuoteWidgetProvider extends AppWidgetProvider {
             Log.d(TAG, "After UpdateAppWidget Call ");
 
             //Not handling row clicks currently
-
         }
-       // super.onUpdate(context,appWidgetManager,appWidgetIds);
-       // ComponentName componentName = new ComponentName(context,QuoteWidgetProvider.class);
-        //appWidgetManager.updateAppWidget(componentName,buildUpdate(context,appWidgetIds));
     }
 
 
