@@ -125,7 +125,9 @@ public class StockDetailActivity extends AppCompatActivity{
 
                         for (int i = 0; i < quotes.size(); i++) {
                             weekly_close_amt.add(quotes.get(i).getAdj_Close());
+
                         }
+                        Collections.reverse(weekly_close_amt);
                         Log.d(TAG, "Weekly Amt Size : before for loop " + String.valueOf(weekly_close_amt.size()));
                         if (weekly_close_amt.size() < 5) {
                             for (int j = weekly_close_amt.size(); j < 5; j++) {
@@ -145,7 +147,9 @@ public class StockDetailActivity extends AppCompatActivity{
                     if (oneDayHistory.getQuery().getResults() != null) {
                         OneDayHistory.QueryEntity.ResultsEntity.QuoteEntity quote = oneDayHistory.getQuery().getResults().getQuote();
                         weekly_close_amt.add(quote.getAdj_Close());
+
                     }
+                    Collections.reverse(weekly_close_amt);
                     if (weekly_close_amt.size() < 5) {
                         for (int j = weekly_close_amt.size(); j < 5; j++) {
                             weekly_close_amt.add("0");
