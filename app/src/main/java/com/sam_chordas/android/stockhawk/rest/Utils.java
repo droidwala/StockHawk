@@ -115,6 +115,16 @@ public class Utils {
         builder.withValue(QuoteColumns.ISUP, 1);
       }
 
+      //newly added columns
+        Log.d(TAG, "buildBatchOperation: COMPANY NAME " + jsonObject.getString("Name"));
+        Log.d(TAG, "buildBatchOperation: YEAR LOW " + jsonObject.getString("YearLow"));
+        Log.d(TAG, "buildBatchOperation: YEAR HIGH " + jsonObject.getString("YearHigh"));
+        Log.d(TAG, "buildBatchOperation: MARKET VALUE " + jsonObject.getString("MarketCapitalization"));
+      builder.withValue(QuoteColumns.COMPANY_NAME,jsonObject.getString("Name"));
+      builder.withValue(QuoteColumns.YEAR_LOW,jsonObject.getString("YearLow"));
+      builder.withValue(QuoteColumns.YEAR_HIGH,jsonObject.getString("YearHigh"));
+      builder.withValue(QuoteColumns.MARKET_VALUE,jsonObject.getString("MarketCapitalization"));
+
     } catch (JSONException e){
       e.printStackTrace();
     }

@@ -105,7 +105,12 @@ public class MyStocksActivity extends AppCompatActivity implements LoaderManager
                     Bundle b = new Bundle();
                     Cursor c = mCursorAdapter.getCursor();
                     c.moveToPosition(position);
-                    b.putString("STOCK",c.getString(c.getColumnIndex("symbol")));
+                    b.putString("STOCK", c.getString(c.getColumnIndex(QuoteColumns.SYMBOL)));
+                    b.putString("Name", c.getString(c.getColumnIndex(QuoteColumns.COMPANY_NAME)));
+                    b.putString("YearLow",c.getString(c.getColumnIndex(QuoteColumns.YEAR_LOW)));
+                    b.putString("YearHigh", c.getString(c.getColumnIndex(QuoteColumns.YEAR_HIGH)));
+                    b.putString("MarketValue", c.getString(c.getColumnIndex(QuoteColumns.MARKET_VALUE)));
+
                     i.putExtras(b);
                     startActivity(i);
                 }
@@ -273,7 +278,9 @@ public class MyStocksActivity extends AppCompatActivity implements LoaderManager
       // we will only keep single records  of all the stocks in the table(so removing is_Current column from table)
     return new CursorLoader(this, QuoteProvider.Quotes.CONTENT_URI,
         new String[]{ QuoteColumns._ID, QuoteColumns.SYMBOL, QuoteColumns.BIDPRICE,
-            QuoteColumns.PERCENT_CHANGE, QuoteColumns.CHANGE, QuoteColumns.ISUP},
+            QuoteColumns.PERCENT_CHANGE, QuoteColumns.CHANGE, QuoteColumns.ISUP,
+            QuoteColumns.COMPANY_NAME,QuoteColumns.YEAR_LOW,QuoteColumns.YEAR_HIGH,
+            QuoteColumns.MARKET_VALUE},
         null,
         null,
         null);

@@ -55,6 +55,7 @@ public class StockDetailActivity extends AppCompatActivity{
     ArrayList<String> sixty_dates = new ArrayList<String>();
 
     TextView no_weekly_data;
+    TextView company_name,year_low,year_high,market_value;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,10 +63,17 @@ public class StockDetailActivity extends AppCompatActivity{
         setContentView(R.layout.stock_detail);
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         no_weekly_data = (TextView) findViewById(R.id.no_weekly_data);
+        company_name = (TextView) toolbar.findViewById(R.id.company_name);
+        year_low = (TextView) toolbar.findViewById(R.id.year_low_value);
+        year_high = (TextView) toolbar.findViewById(R.id.year_high_value);
+        market_value = (TextView) toolbar.findViewById(R.id.market_value);
         setSupportActionBar(toolbar);
-
         Bundle b = getIntent().getExtras();
         stock_name = b.getString("STOCK");
+        company_name.setText(b.getString("Name"));
+        year_low.setText(b.getString("YearLow"));
+        year_high.setText(b.getString("YearHigh"));
+        market_value.setText("$" + b.getString("MarketValue"));
         Log.d(TAG, "onCreate: called " + b.getString("STOCK"));
 
 

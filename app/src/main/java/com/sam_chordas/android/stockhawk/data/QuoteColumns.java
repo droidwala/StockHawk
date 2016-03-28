@@ -23,5 +23,13 @@ public class QuoteColumns {
   public static final String CREATED = "created";
   @DataType(DataType.Type.INTEGER) @NotNull
   public static final String ISUP = "is_up";
- //Is_Current Column removed..
+  @DataType(DataType.Type.TEXT)
+  public static final String YEAR_LOW = "year_low";
+  @DataType(DataType.Type.TEXT)
+  public static final String YEAR_HIGH = "year_high";
+  @DataType(DataType.Type.TEXT)
+  public static final String COMPANY_NAME = "company_name";
+  @DataType(DataType.Type.TEXT)
+  public static final String MARKET_VALUE = "market_value";
+
 }
