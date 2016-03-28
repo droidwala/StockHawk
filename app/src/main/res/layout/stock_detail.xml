@@ -23,11 +23,20 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
+            <ProgressBar
+                android:id="@+id/progressbar"
+                android:layout_width="@dimen/progress_bar_circular_size"
+                android:layout_height="@dimen/progress_bar_circular_size"
+                android:visibility="invisible"
+                android:layout_gravity="center"
+                android:layout_marginTop="80dp"
+                style="@style/Widget.AppCompat.ProgressBar"/>
             <android.support.v7.widget.CardView
                 android:id="@+id/weekly_card"
                 android:layout_width="match_parent"
                 android:layout_height="200dp"
                 android:layout_margin="5dp"
+                android:visibility="gone"
                 app:cardCornerRadius="4dp"
                 app:cardBackgroundColor="@color/weekly_card_background">
                 <FrameLayout
@@ -70,6 +79,7 @@
                 android:id="@+id/monthly_card"
                 android:layout_width="match_parent"
                 android:layout_height="250dp"
+                android:visibility="gone"
                 app:cardCornerRadius="4dp"
                 android:layout_margin="5dp"
                 app:cardBackgroundColor="@color/monthly_card_background">
@@ -100,6 +110,7 @@
                 android:id="@+id/sixty_days_card"
                 android:layout_width="match_parent"
                 android:layout_height="250dp"
+                android:visibility="gone"
                 app:cardCornerRadius="4dp"
                 android:layout_margin="5dp"
                 app:cardBackgroundColor="@color/sixty_days_card_background">
