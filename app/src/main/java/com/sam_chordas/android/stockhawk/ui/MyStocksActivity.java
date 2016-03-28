@@ -331,6 +331,11 @@ public class MyStocksActivity extends AppCompatActivity implements LoaderManager
                 Intent i = new Intent(QuoteWidgetProvider.STOCK_UPDATED_INTENT);
                 sendBroadcast(i);
             }
+            else if(intent.getIntExtra("RESULT",99) == 299){
+                //Receives intent when items are removed from recyclerview to overcome existing issue in melnykov's FAB library.
+                if(!fab.isVisible())
+                    fab.show();
+            }
 
         }
     }
