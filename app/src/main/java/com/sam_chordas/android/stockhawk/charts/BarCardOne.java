@@ -7,26 +7,18 @@ import android.os.Build;
 import android.support.v7.widget.CardView;
 import android.util.Log;
 import android.view.View;
-import android.widget.TextView;
 
 import com.db.chart.Tools;
 import com.db.chart.model.BarSet;
-import com.db.chart.model.LineSet;
 import com.db.chart.view.AxisController;
 import com.db.chart.view.BarChartView;
-import com.db.chart.view.LineChartView;
 import com.db.chart.view.Tooltip;
 import com.db.chart.view.XController;
-import com.db.chart.view.YController;
 import com.db.chart.view.animation.Animation;
-import com.db.chart.view.animation.easing.BounceEase;
 import com.db.chart.view.animation.easing.LinearEase;
 import com.sam_chordas.android.stockhawk.R;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
 
 public class BarCardOne {
 
@@ -83,7 +75,6 @@ public class BarCardOne {
             mChart.setAxisBorderValues(MIN, MAX, STEP);
 
 
-
         int[] order = {1,0,2,3,4};
 
         Runnable chartAction = new Runnable() {
@@ -92,8 +83,6 @@ public class BarCardOne {
                 showTooltip();
             }
         };
-
-
 
         mChart.show(new Animation()
                 .setOverlap(.7f, order)
@@ -105,88 +94,17 @@ public class BarCardOne {
 
     private void MinMaxAndStepLogic(){
 
-        min_value = (int) getMin_value(values);
-        max_value = (int) getMax_value(values);
+        min_value = (int) MinMaxHelper.getMin_value(values);
+        max_value = (int) MinMaxHelper.getMax_value(values);
 
-        //Min logic
-        if(min_value > 0 && min_value < 10){
-            MIN = 0;
-        }
-        else if(min_value > 9 && min_value < 100){
-            MIN = min_value - (min_value % 10);//2 digit
-        }
-        else if(min_value > 99 && min_value < 1000){
-            MIN = min_value - (min_value % 100);//3 digit
-        }
-        else if(min_value > 999 && min_value < 10000){
-            MIN = min_value - (min_value % 1000);//4 digit
-        }
-        else if(min_value > 9999 && max_value < 100000){
-            MIN = min_value - (min_value % 10000);// 5 digit
-        }
-        else if(min_value==0){
-            MIN = 0;
-        }
-
-        //Max logic
-        if(max_value > 0 && max_value < 9){
-            MAX = 10;
-        }
-        else if(max_value > 9 && max_value < 100){
-            MAX = (max_value - (max_value % 10)) + 10;//2 digit
-        }
-        else if(max_value > 99 && max_value < 1000){
-            MAX = (max_value - (max_value % 100)) + 100;//3 digit
-        }
-        else if(max_value > 999 && max_value < 10000){
-            MAX = (max_value - (max_value % 1000)) + 1000;//4 digit
-        }
-        else if(max_value > 9999 && max_value < 100000){
-            MAX = (max_value - (max_value % 10000)) + 10000;// 5 digit
-        }
-        else if(max_value == 0){
-            MAX = 0;
-        }
-
-        //STEP logic
-
-        STEP = GCD(MAX,MIN);
+        MIN = MinMaxHelper.getMinGraphValue(min_value);
+        MAX = MinMaxHelper.getMaxGraphValue(max_value);
+        STEP = MinMaxHelper.GCD(MAX, MIN);
 
         Log.d(TAG, "BarcardOne: initialize " + " MIN " + String.valueOf(MIN) +
         " MAX " + String.valueOf(MAX) + " STEP " + String.valueOf(STEP));
     }
 
-    private int GCD(int a,int b){
-        if(b==0) return a;
-        return GCD(b,a%b);
-    }
-
-    private float getMin_value(float[] inputArray){
-
-        float minvalue = inputArray[0];
-
-        for(int i=1;i<=inputArray.length - 1;i++){
-            if(inputArray[i] !=0 && inputArray[i] < minvalue){
-                minvalue = inputArray[i];
-            }
-        }
-
-        return minvalue;
-    }
-
-    private float getMax_value(float[] inputArray){
-
-        float maxvalue = inputArray[0];
-
-        for (int i = 1; i <= inputArray.length - 1 ; i++) {
-            if(inputArray[i] > maxvalue){
-                maxvalue = inputArray[i];
-            }
-        }
-
-        //Log.d(TAG, "getMin_value: " + String.valueOf(inputArray.length));
-        return maxvalue;
-    }
 
     private void showTooltip(){
 
@@ -196,7 +114,6 @@ public class BarCardOne {
         mTip.setDimensions((int) Tools.fromDpToPx(80), (int) Tools.fromDpToPx(25));
 
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
-
             mTip.setEnterAnimation(PropertyValuesHolder.ofFloat(View.ALPHA, 1),
                     PropertyValuesHolder.ofFloat(View.SCALE_Y, 1f),
                     PropertyValuesHolder.ofFloat(View.SCALE_X, 1f)).setDuration(200);
@@ -204,10 +121,6 @@ public class BarCardOne {
             mTip.setExitAnimation(PropertyValuesHolder.ofFloat(View.ALPHA, 0),
                     PropertyValuesHolder.ofFloat(View.SCALE_Y, 0f),
                     PropertyValuesHolder.ofFloat(View.SCALE_X, 0f)).setDuration(200);
-
-            //mTip.setPivotX(Tools.fromDpToPx(65) / 2);
-            //mTip.setPivotY(Tools.fromDpToPx(25));
-
         }
 
         mTip.setMargins(0,0,0, (int) Tools.fromDpToPx(10));

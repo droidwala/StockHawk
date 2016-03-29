@@ -49,94 +49,17 @@ public class LineCardTwo {
             values[j] = Float.parseFloat(amounts.get(j));
         }
         MinMaxAndStepLogic();
-
     }
 
     private void MinMaxAndStepLogic(){
-
-        min_value = (int) getMin_value(values);
-        max_value = (int) getMax_value(values);
-
-        //Min logic
-        if(min_value > 0 && min_value < 10){
-            MIN = 0;
-        }
-        else if(min_value > 9 && min_value < 100){
-            MIN = min_value - (min_value % 10);//2 digit
-        }
-        else if(min_value > 99 && min_value < 1000){
-            MIN = min_value - (min_value % 100);//3 digit
-        }
-        else if(min_value > 999 && min_value < 10000){
-            MIN = min_value - (min_value % 1000);//4 digit
-        }
-        else if(min_value > 9999 && max_value < 100000){
-            MIN = min_value - (min_value % 10000);// 5 digit
-        }
-        else if(min_value==0){
-            MIN = 0;
-        }
-
-        //Max logic
-        if(max_value > 0 && max_value < 9){
-            MAX = 10;
-        }
-        else if(max_value > 9 && max_value < 100){
-            MAX = (max_value - (max_value % 10)) + 10;//2 digit
-        }
-        else if(max_value > 99 && max_value < 1000){
-            MAX = (max_value - (max_value % 100)) + 100;//3 digit
-        }
-        else if(max_value > 999 && max_value < 10000){
-            MAX = (max_value - (max_value % 1000)) + 1000;//4 digit
-        }
-        else if(max_value > 9999 && max_value < 100000){
-            MAX = (max_value - (max_value % 10000)) + 10000;// 5 digit
-        }
-        else if(max_value == 0){
-            MAX = 0;
-        }
-
-        //STEP logic
-
-        STEP = GCD(MAX,MIN);
+        min_value = (int) MinMaxHelper.getMin_value(values);
+        max_value = (int) MinMaxHelper.getMax_value(values);
+        MIN = MinMaxHelper.getMinGraphValue(min_value);
+        MAX = MinMaxHelper.getMaxGraphValue(max_value);
+        STEP = MinMaxHelper.GCD(MAX,MIN);
 
         Log.d(TAG, "LineCardTwo: " + String.valueOf(MIN) );
     }
-
-    private int GCD(int a,int b){
-        if(b==0) return a;
-        return GCD(b,a%b);
-    }
-
-    private float getMin_value(float[] inputArray){
-
-        float minvalue = inputArray[0];
-
-        for(int i=1;i<=inputArray.length - 1;i++){
-            if(inputArray[i] < minvalue){
-                minvalue = inputArray[i];
-            }
-
-        }
-
-        return minvalue;
-    }
-
-    private float getMax_value(float[] inputArray){
-
-        float maxvalue = inputArray[0];
-
-        for (int i = 1; i <= inputArray.length - 1 ; i++) {
-            if(inputArray[i] > maxvalue){
-                maxvalue = inputArray[i];
-            }
-        }
-
-        //Log.d(TAG, "getMin_value: " + String.valueOf(inputArray.length));
-        return maxvalue;
-    }
-
 
     public void show(){
         LineSet dataSet = new LineSet(labels,values);
