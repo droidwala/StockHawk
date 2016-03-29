@@ -219,7 +219,6 @@ public class StockDetailActivity extends AppCompatActivity{
     }
 
 
-
     private void FetchSixtyData(String url) throws IOException{
         Request request = new Request.Builder()
                 .url(url).build();
@@ -292,6 +291,7 @@ public class StockDetailActivity extends AppCompatActivity{
         past_thirty = df.format(c.getTime());
         c.add(Calendar.DATE,-30);
         past_sixty = df.format(c.getTime());
+
     }
 
     private String GenerateUrl(String d1,String d2){

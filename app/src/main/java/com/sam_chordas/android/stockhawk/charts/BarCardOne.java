@@ -14,6 +14,7 @@ import com.db.chart.view.AxisController;
 import com.db.chart.view.BarChartView;
 import com.db.chart.view.Tooltip;
 import com.db.chart.view.XController;
+import com.db.chart.view.YController;
 import com.db.chart.view.animation.Animation;
 import com.db.chart.view.animation.easing.LinearEase;
 import com.sam_chordas.android.stockhawk.R;
@@ -67,12 +68,13 @@ public class BarCardOne {
                 .setLabelsColor(Color.parseColor("#FFFFFF"));
 
 
+
         Log.d(TAG, "BarcardOne: Inside method show " + " MIN " + String.valueOf(MIN) +
                 " MAX " + String.valueOf(MAX) + " STEP " + String.valueOf(STEP));
 
 
         if(MIN > 0 && MAX > 0) //For cases where stock price is less than 1 don't set up axisbordervalues instead use default ones.
-            mChart.setAxisBorderValues(MIN, MAX, STEP);
+            mChart.setAxisBorderValues(MIN,MAX,STEP);
 
 
         int[] order = {1,0,2,3,4};
@@ -121,6 +123,9 @@ public class BarCardOne {
             mTip.setExitAnimation(PropertyValuesHolder.ofFloat(View.ALPHA, 0),
                     PropertyValuesHolder.ofFloat(View.SCALE_Y, 0f),
                     PropertyValuesHolder.ofFloat(View.SCALE_X, 0f)).setDuration(200);
+
+            mTip.setPivotX(Tools.fromDpToPx(65) / 2);
+            mTip.setPivotY(Tools.fromDpToPx(25));
         }
 
         mTip.setMargins(0,0,0, (int) Tools.fromDpToPx(10));

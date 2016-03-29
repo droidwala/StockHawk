@@ -64,6 +64,7 @@ public class LineCardTwo {
     public void show(){
         LineSet dataSet = new LineSet(labels,values);
         dataSet.setColor(Color.parseColor("#53c1bd"))
+                .setDotsColor(Color.parseColor("#ffc755"))
                 .setFill(Color.parseColor("#3d6c73"))
                 .setGradientFill(new int[]{Color.parseColor("#364d5a"), Color.parseColor("#3f7178")}, null);
 
