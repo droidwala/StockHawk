@@ -58,7 +58,7 @@ public class LineCardThree {
         if(min_value > 0 && min_value < 10){
             MIN = 0;
         }
-        else if(min_value > 9 && min_value < 99){
+        else if(min_value > 9 && min_value < 100){
             MIN = min_value - (min_value % 10);//2 digit
         }
         else if(min_value > 99 && min_value < 1000){
@@ -78,7 +78,7 @@ public class LineCardThree {
         if(max_value > 0 && max_value < 9){
             MAX = 10;
         }
-        else if(max_value > 9 && max_value < 99){
+        else if(max_value > 9 && max_value < 100){
             MAX = (max_value - (max_value % 10)) + 10;//2 digit
         }
         else if(max_value > 99 && max_value < 1000){
