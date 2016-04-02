@@ -10,24 +10,20 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.google.gson.Gson;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonPrimitive;
 import com.google.gson.reflect.TypeToken;
 import com.sam_chordas.android.stockhawk.R;
-import com.sam_chordas.android.stockhawk.charts.BarCardOne;
 import com.sam_chordas.android.stockhawk.charts.LineCardThree;
 import com.sam_chordas.android.stockhawk.charts.LineCardTwo;
+import com.sam_chordas.android.stockhawk.charts.MPBarChart;
 import com.sam_chordas.android.stockhawk.pojo.History;
 import com.sam_chordas.android.stockhawk.pojo.OneDayHistory;
 import com.squareup.okhttp.Callback;
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
 import com.squareup.okhttp.Response;
-
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -38,7 +34,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Locale;
-import java.util.concurrent.TimeoutException;
 
 public class StockDetailActivity extends AppCompatActivity{
 
@@ -185,9 +180,11 @@ public class StockDetailActivity extends AppCompatActivity{
                     public void run() {
                         weekly_progressBar.setVisibility(View.INVISIBLE);
                         if(weekly_close_amt.size()>0)
-                            new BarCardOne((CardView) findViewById(R.id.weekly_card), StockDetailActivity.this, weekly_close_amt).show();
-                        else
+                            new MPBarChart((CardView)findViewById(R.id.weekly_card),weekly_close_amt);
+                        else {
+                            new MPBarChart((CardView)findViewById(R.id.weekly_card));
                             no_weekly_data.setVisibility(View.VISIBLE);
+                        }
                     }
                 });
 
@@ -239,8 +236,14 @@ public class StockDetailActivity extends AppCompatActivity{
                     }
                 }
                 else{
-                    no_monthly_data.setText("Sorry,looks like we don't have\nhistorical data available for this stock!");
-                    Log.d(TAG, "onResponse: We should have atleast more than one result count to plot line chart properly");
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            no_monthly_data.setText("Sorry,looks like we don't have\nhistorical data available for this stock!");
+                            Log.d(TAG, "onResponse: We should have atleast more than one result count to plot line chart properly");
+                        }
+                    });
+
 
                 }
 
@@ -298,8 +301,14 @@ public class StockDetailActivity extends AppCompatActivity{
                     }
                 }
                 else{
-                    no_sixty_data.setText("Sorry,looks like we don't have\nhistorical data available for this stock!");
-                    Log.d(TAG, "onResponse: Sixty days data should have result count at least more than one to plot LC properly");
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            no_sixty_data.setText("Sorry,looks like we don't have\nhistorical data available for this stock!");
+                            Log.d(TAG, "onResponse: Sixty days data should have result count at least more than one to plot LC properly");
+                        }
+                    });
+
                 }
 
                 runOnUiThread(new Runnable() {
@@ -322,7 +331,8 @@ public class StockDetailActivity extends AppCompatActivity{
         JsonObject query = object.getAsJsonObject("query");
         JsonPrimitive count = query.getAsJsonPrimitive("count");
         return count.getAsInt();
-    };
+    }
+
     private void InitializingDates(){
         Calendar c = Calendar.getInstance();
         c.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
@@ -354,6 +364,7 @@ public class StockDetailActivity extends AppCompatActivity{
         }
         return urlString.toString();
     }
+
 
 
 

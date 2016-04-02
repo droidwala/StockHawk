@@ -35,13 +35,12 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:orientation="vertical">
-                    <com.db.chart.view.BarChartView
+                    <com.github.mikephil.charting.charts.BarChart
                         android:id="@+id/weekly_bar_chart"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:layout_gravity="left|top"
-                        android:layout_margin="16dp"
-                        app:chart_axisColor="#30547d99"/>
+                        android:layout_margin="16dp"/>
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
