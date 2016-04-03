@@ -33,6 +33,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Locale;
 
 public class StockDetailActivity extends AppCompatActivity{
@@ -47,13 +48,14 @@ public class StockDetailActivity extends AppCompatActivity{
     private TextView company_name,year_low,year_high,market_value;
     private ProgressBar weekly_progressBar,monthly_progressBar,sixty_progressBar;
 
-    ArrayList<String> weekly_close_amt = new ArrayList<String>();//Used to store weekly data
+    ArrayList<String> weekly_close_amt = new ArrayList<>();//Used to store weekly data
 
-    ArrayList<String> monthly_close_amt = new ArrayList<String>();//Used to store monthly data
-    ArrayList<String> monthly_dates = new ArrayList<String>();
+    ArrayList<String> monthly_close_amt = new ArrayList<>();//Used to store monthly data
+    ArrayList<String> monthly_dates = new ArrayList<>();
 
-    ArrayList<String> sixty_close_amt = new ArrayList<String>();//Used to store Past sixty days data
-    ArrayList<String> sixty_dates = new ArrayList<String>();
+    ArrayList<String> sixty_close_amt = new ArrayList<>();//Used to store Past sixty days data
+    ArrayList<String> sixty_dates = new ArrayList<>();
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -81,9 +83,21 @@ public class StockDetailActivity extends AppCompatActivity{
         Bundle b = getIntent().getExtras();
         stock_name = b.getString("STOCK");
         company_name.setText(b.getString("Name"));
-        year_low.setText(b.getString("YearLow"));
-        year_high.setText(b.getString("YearHigh"));
-        market_value.setText("$" + b.getString("MarketValue"));
+        if(!b.getString("YearLow").equals("null"))
+            year_low.setText(b.getString("YearLow"));
+        else
+            year_low.setText("NA");
+
+        if(!b.getString("YearHigh").equals("null"))
+            year_high.setText(b.getString("YearHigh"));
+        else
+            year_high.setText("NA");
+
+        if(!b.getString("MarketValue").equals("null"))
+            market_value.setText("$" + b.getString("MarketValue"));
+        else
+            market_value.setText("NA");
+
         Log.d(TAG, "onCreate: called " + b.getString("STOCK"));
 
         //Initializing all date variables.
@@ -91,13 +105,17 @@ public class StockDetailActivity extends AppCompatActivity{
 
         //Create weekly api query for the given stock name
         try {
+            //Fetching weekly data
             weekly_progressBar.setVisibility(View.VISIBLE);
             FetchWeeklyData(GenerateUrl(startDate, endDate));
+
+            //Fetching monthly data
             monthly_progressBar.setVisibility(View.VISIBLE);
             FetchMonthlyData(GenerateUrl(past_thirty,today_date));
+
+            //Fetching Sixty days data
             sixty_progressBar.setVisibility(View.VISIBLE);
             FetchSixtyData(GenerateUrl(past_sixty,today_date));
-
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -111,7 +129,7 @@ public class StockDetailActivity extends AppCompatActivity{
         client.newCall(request).enqueue(new Callback() {
             @Override
             public void onFailure(Request request, IOException e) {
-                //We need to handle timeout exception..
+                //We are yet to implement a way to handle timeout exception..
             }
 
             @Override
@@ -125,6 +143,7 @@ public class StockDetailActivity extends AppCompatActivity{
                     }.getType());
                     if (history.getQuery().getResults() != null) {
                         ArrayList<History.QueryEntity.ResultsEntity.QuoteEntity> quotes = (ArrayList<History.QueryEntity.ResultsEntity.QuoteEntity>) history.getQuery().getResults().getQuote();
+                        Log.d(TAG, "onResponse: Weekly " + String.valueOf(quotes.size()));
                         for (int i = 0; i < quotes.size(); i++) {
                             weekly_close_amt.add(quotes.get(i).getAdj_Close());
 
@@ -136,10 +155,12 @@ public class StockDetailActivity extends AppCompatActivity{
                             }
                         }
                     } else {
-                        Log.d(TAG, "onResponse: No data!!");
+                        Log.d(TAG, "Result count is greater than 1 but still the results object is null");
                     }
                 }
                 else if (result_count == 1) {
+                    //Different Object is used to use Gson parsing when the result count is 1
+                    //Because Json structure is different from the usual response we get in such cases(res_count==1)
                     Gson gson = new Gson();
                     OneDayHistory oneDayHistory = gson.fromJson(result, new TypeToken<OneDayHistory>() {
                     }.getType());
@@ -156,20 +177,24 @@ public class StockDetailActivity extends AppCompatActivity{
                     }
                 }
                 else if(Calendar.getInstance().get(Calendar.DAY_OF_WEEK) == Calendar.MONDAY){
+                    //Set message to show to let user know that chart won't have data
+                    //since current week has just started
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            no_weekly_data.setText("Sorry,the week has just started.\nNo data for current week!");
+                            no_weekly_data.setText(StockDetailActivity.this.getResources().getString(R.string.week_started));
                             Log.d(TAG, "NO DATA FOR CURRENT WEEK BRO!!");
                         }
                     });
 
                 }
                 else{
+                    //If all the above conditions don't satisfy it means
+                    // the historical data is not available for the stock
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            no_weekly_data.setText("Sorry,looks like we don't have\nhistorical data available for this stock!");
+                            no_weekly_data.setText(StockDetailActivity.this.getResources().getString(R.string.no_historical_data));
                         }
                     });
 
@@ -179,8 +204,9 @@ public class StockDetailActivity extends AppCompatActivity{
                     @Override
                     public void run() {
                         weekly_progressBar.setVisibility(View.INVISIBLE);
-                        if(weekly_close_amt.size()>0)
-                            new MPBarChart((CardView)findViewById(R.id.weekly_card),weekly_close_amt);
+                        if(weekly_close_amt.size()>0) {
+                            new MPBarChart((CardView) findViewById(R.id.weekly_card), weekly_close_amt);
+                        }
                         else {
                             new MPBarChart((CardView)findViewById(R.id.weekly_card));
                             no_weekly_data.setVisibility(View.VISIBLE);
@@ -210,43 +236,26 @@ public class StockDetailActivity extends AppCompatActivity{
             public void onResponse(Response response) throws IOException {
                 String result = response.body().string();
                 int result_count = getResultCount(result);
-
+                HashMap<String,ArrayList<String>> data;
                 if(result_count>1) {
-                    Gson gson = new Gson();
-                    History history = gson.fromJson(result, new TypeToken<History>() {
-                    }.getType());
-                    if (history.getQuery().getResults() != null) {
-                        ArrayList<History.QueryEntity.ResultsEntity.QuoteEntity> quotes = (ArrayList<History.QueryEntity.ResultsEntity.QuoteEntity>) history.getQuery().getResults().getQuote();
-                        for (int i = 0; i < quotes.size(); i++) {
-                            if (i == 0) {
-                                monthly_dates.add(quotes.get(i).getDate());
-                            } else if (i == quotes.size() - 1) {
-                                monthly_dates.add(quotes.get(i).getDate());
-                            } else {
-                                monthly_dates.add("");
-                            }
-                            monthly_close_amt.add(quotes.get(i).getAdj_Close());
-                        }
-
-                        Collections.reverse(monthly_close_amt);
-                        Collections.reverse(monthly_dates);
-
-                    } else {
-                        Log.d(TAG, "onResponse: No data!!");
+                    data = parsingResponse(result);
+                    if(data!=null) {
+                        monthly_dates = data.get("dates");
+                        monthly_close_amt = data.get("amounts");
+                    }
+                    else{
+                        Log.d(TAG, "onResponse: DANG!!");
                     }
                 }
                 else{
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            no_monthly_data.setText("Sorry,looks like we don't have\nhistorical data available for this stock!");
-                            Log.d(TAG, "onResponse: We should have atleast more than one result count to plot line chart properly");
+                            no_monthly_data.setText(StockDetailActivity.this.getResources().getString(R.string.no_historical_data));
+                            Log.d(TAG, "onResponse: We should have at least more than one result count to plot line chart properly");
                         }
                     });
-
-
                 }
-
 
                 runOnUiThread(new Runnable() {
                     @Override
@@ -278,33 +287,22 @@ public class StockDetailActivity extends AppCompatActivity{
                 String result = response.body().string();
                 int result_count = getResultCount(result);
 
+                HashMap<String,ArrayList<String>> data;
                 if(result_count>1) {
-                    Gson gson = new Gson();
-                    History history = gson.fromJson(result, new TypeToken<History>() {
-                    }.getType());
-                    if (history.getQuery().getResults() != null) {
-                        ArrayList<History.QueryEntity.ResultsEntity.QuoteEntity> quotes = (ArrayList<History.QueryEntity.ResultsEntity.QuoteEntity>) history.getQuery().getResults().getQuote();
-                        for (int i = 0; i < quotes.size(); i++) {
-                            if (i == 0) {
-                                sixty_dates.add(quotes.get(i).getDate());
-                            } else if (i == quotes.size() - 1) {
-                                sixty_dates.add(quotes.get(i).getDate());
-                            } else {
-                                sixty_dates.add("");
-                            }
-                            sixty_close_amt.add(quotes.get(i).getAdj_Close());
-                        }
-                        Collections.reverse(sixty_close_amt);//since the data comes in descending order
-                        Collections.reverse(sixty_dates);
-                    } else {
-                        Log.d(TAG, "onResponse: No data!!");
+                    data = parsingResponse(result);
+                    if(data!=null) {
+                        sixty_dates = data.get("dates");
+                        sixty_close_amt = data.get("amounts");
+                    }
+                    else{
+                        Log.d(TAG, "onResponse: DANG!!");
                     }
                 }
                 else{
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            no_sixty_data.setText("Sorry,looks like we don't have\nhistorical data available for this stock!");
+                            no_sixty_data.setText(StockDetailActivity.this.getResources().getString(R.string.no_historical_data));
                             Log.d(TAG, "onResponse: Sixty days data should have result count at least more than one to plot LC properly");
                         }
                     });
@@ -340,12 +338,18 @@ public class StockDetailActivity extends AppCompatActivity{
         startDate = df.format(c.getTime());
         c.add(Calendar.DATE, 4);
         endDate = df.format(c.getTime());
-        c.add(Calendar.DATE,-4);
-        today_date = df.format(c.getTime());
-        c.add(Calendar.DATE,-30);
-        past_thirty = df.format(c.getTime());
-        c.add(Calendar.DATE,-30);
-        past_sixty = df.format(c.getTime());
+        Log.d(TAG, "InitializingDates: " + " Start Date " + startDate + "\n"
+          + " End Date" + endDate);
+
+        Calendar c1 = Calendar.getInstance();
+        today_date = df.format(c1.getTime());
+        c1.add(Calendar.DATE,-30);
+        past_thirty = df.format(c1.getTime());
+        c1.add(Calendar.DATE,-30);
+        past_sixty = df.format(c1.getTime());
+
+        Log.d(TAG, "InitializingDates:" + " Today_date" + today_date + " \n"
+         + " Past Thirty " + past_thirty + "\nPast Sixty " + past_sixty);
 
     }
 
@@ -366,7 +370,40 @@ public class StockDetailActivity extends AppCompatActivity{
     }
 
 
+    private HashMap<String,ArrayList<String>> parsingResponse(String result){
 
+        ArrayList<String> dates = new ArrayList<>();
+        ArrayList<String> amounts = new ArrayList<>();
+
+        HashMap<String,ArrayList<String>> data = new HashMap<>();
+
+        Gson gson = new Gson();
+        History history = gson.fromJson(result, new TypeToken<History>() {
+        }.getType());
+        if (history.getQuery().getResults() != null) {
+            ArrayList<History.QueryEntity.ResultsEntity.QuoteEntity> quotes = (ArrayList<History.QueryEntity.ResultsEntity.QuoteEntity>) history.getQuery().getResults().getQuote();
+            for (int i = 0; i < quotes.size(); i++) {
+                if (i == 0) {
+                    dates.add(quotes.get(i).getDate());
+                } else if (i == quotes.size() - 1) {
+                    dates.add(quotes.get(i).getDate());
+                } else {
+                    dates.add("");
+                }
+                amounts.add(quotes.get(i).getAdj_Close());
+            }
+
+            Collections.reverse(amounts);
+            Collections.reverse(dates);
+
+        } else {
+            Log.d(TAG, "onResponse: No data!!");
+        }
+
+        data.put("dates",dates);
+        data.put("amounts",amounts);
+        return  data;
+    }
 
 }
 

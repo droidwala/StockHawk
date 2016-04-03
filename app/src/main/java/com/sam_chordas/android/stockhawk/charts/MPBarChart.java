@@ -2,6 +2,7 @@ package com.sam_chordas.android.stockhawk.charts;
 
 import android.graphics.Color;
 import android.support.v7.widget.CardView;
+import android.view.View;
 
 import com.github.mikephil.charting.charts.BarChart;
 import com.github.mikephil.charting.components.XAxis;
@@ -18,6 +19,7 @@ public class MPBarChart {
     BarChart barChart;
     public MPBarChart(CardView card,ArrayList<String> amounts){
         barChart = (BarChart) card.findViewById(R.id.weekly_bar_chart);
+        barChart.setVisibility(View.VISIBLE);
         SettingUpBarChart();
         DrawingChart(amounts);
     }

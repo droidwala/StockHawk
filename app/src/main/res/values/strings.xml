@@ -15,7 +15,8 @@
   <string name="weekly_chart_header">Current Week</string>
   <string name="no_weekly_data">Sorry week has just started.\nNo data for current week!</string>
   <string name="no_data">Oops!!Server didn\'t returned anything!</string>
-
+  <string name="week_started">Sorry,the week has just started.\nNo data for current week!</string>
+  <string name="no_historical_data">Sorry,no historical data\navailable for this stock</string>
   <string-array name="intervals">
     <item>5 minutes</item>
     <item>15 minutes(Default)</item>
