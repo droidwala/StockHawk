@@ -1,8 +1,10 @@
 package com.sam_chordas.android.stockhawk.service;
 
+import android.appwidget.AppWidgetProvider;
 import android.content.ContentProviderOperation;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.Intent;
 import android.content.OperationApplicationException;
 import android.database.Cursor;
 import android.database.DatabaseUtils;
@@ -18,6 +20,7 @@ import com.google.android.gms.gcm.TaskParams;
 import com.sam_chordas.android.stockhawk.data.QuoteColumns;
 import com.sam_chordas.android.stockhawk.data.QuoteProvider;
 import com.sam_chordas.android.stockhawk.rest.Utils;
+import com.sam_chordas.android.stockhawk.widget.QuoteWidgetProvider;
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
 import com.squareup.okhttp.Response;
@@ -37,7 +40,6 @@ public class StockTaskService extends GcmTaskService{
   private static final int NO_STOCK_FOUND = 5;
   private static final int SERVER_ISSUE = 6;
   private static final int NEW_STOCK_ADDED = 7;
-  private static final int UPDATING_EXISTING = 10;
   private String LOG_TAG = StockTaskService.class.getSimpleName();
 
   private OkHttpClient client = new OkHttpClient();
@@ -63,6 +65,7 @@ public class StockTaskService extends GcmTaskService{
 
   @Override
   public int onRunTask(TaskParams params){
+    Log.d(TAG, "onRunTask: called ");
     Cursor initQueryCursor;
     if (mContext == null){
       mContext = this;
@@ -144,7 +147,7 @@ public class StockTaskService extends GcmTaskService{
             // No more is_Current column logic
             if (isUpdate) {
                 Log.d(TAG, "Deleting Existing Stock to avoid duplicates");
-                result = UPDATING_EXISTING;
+                result = GcmNetworkManager.RESULT_SUCCESS;
                 mContext.getContentResolver().delete(QuoteProvider.Quotes.CONTENT_URI,null,null);
             }
             else{
@@ -153,6 +156,7 @@ public class StockTaskService extends GcmTaskService{
 
               mContext.getContentResolver().applyBatch(QuoteProvider.AUTHORITY,
                       batchOperations);
+
           }
           else{
             if(isSuccessful) {
@@ -173,6 +177,11 @@ public class StockTaskService extends GcmTaskService{
       }
     }
 
+      if(isUpdate && params.getTag().equals("periodic")){
+          //send broadcast to update our stock hawk widget
+          Intent i = new Intent(QuoteWidgetProvider.STOCK_UPDATED_INTENT);
+          mContext.sendBroadcast(i);
+      }
     Log.d(TAG, "Result returned : " + String.valueOf(result));
     return result;
   }

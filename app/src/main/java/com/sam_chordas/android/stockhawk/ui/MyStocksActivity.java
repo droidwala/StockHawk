@@ -163,7 +163,7 @@ public class MyStocksActivity extends AppCompatActivity implements LoaderManager
 
     mTitle = getTitle();
     if (CheckConnection()){
-      long period = 3600L;
+      long period = 1800L;
       long flex = 10L;
       String periodicTag = "periodic";
 
@@ -327,7 +327,8 @@ public class MyStocksActivity extends AppCompatActivity implements LoaderManager
                 Intent i = new Intent(QuoteWidgetProvider.STOCK_ADDED_INTENT);
                 sendBroadcast(i);
             }
-            else if(intent.getIntExtra("RESULT",99) == 10){
+            else if(intent.getIntExtra("RESULT",99) == 0){
+                Log.d(TAG, "Inside onReceive CAPTAIN!!");
                 Intent i = new Intent(QuoteWidgetProvider.STOCK_UPDATED_INTENT);
                 sendBroadcast(i);
             }
