@@ -70,9 +70,6 @@ public class QuoteWidgetProvider extends AppWidgetProvider {
 
             widget.setRemoteAdapter(R.id.widget_list, svcIntent);
 
-            Intent settings = new Intent(context,IntervalSettingsActivity.class);
-            PendingIntent pi = PendingIntent.getActivity(context,0,settings,0);
-            widget.setOnClickPendingIntent(R.id.settings_btn,pi);
             Log.d(TAG, "Before UpdateAppWidget Call ");
             appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetIds[i],R.id.widget_list);
             appWidgetManager.updateAppWidget(appWidgetIds[i], widget);
