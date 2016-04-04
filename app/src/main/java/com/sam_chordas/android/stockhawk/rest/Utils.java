@@ -1,16 +1,16 @@
 package com.sam_chordas.android.stockhawk.rest;
 
 import android.content.ContentProviderOperation;
-import android.content.Context;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.sam_chordas.android.stockhawk.data.QuoteColumns;
 import com.sam_chordas.android.stockhawk.data.QuoteProvider;
-import java.util.ArrayList;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.util.ArrayList;
 
 /**
  * Created by sam_chordas on 10/8/15.
@@ -18,7 +18,6 @@ import org.json.JSONObject;
 public class Utils {
 
   private static final String TAG = "Utils";
-  private static final int SERVICE_DOWN = 4;
   private static String LOG_TAG = Utils.class.getSimpleName();
 
   public static boolean showPercent = true;
@@ -37,29 +36,18 @@ public class Utils {
             if (count == 1) {
                 jsonObject = jsonObject.optJSONObject("results")
                         .optJSONObject("quote");
-                Log.d(TAG, "Quote :  " + jsonObject.toString());
-                //Log.d(TAG, "Ask value : " + jsonObject.optString("Ask"));
-                String ask_value = null;
-                if(jsonObject.has("Ask")) {
-                    ask_value = jsonObject.getString("Ask");
-                }
-                if (!ask_value.equals("null")) {
-                    Log.d(TAG, "Ask Value :  " + ask_value);
-                    Log.d(TAG, "Utils : This is Not null!!");
+                if(!checkForNulls(jsonObject)){
                     batchOperations.add(buildBatchOperation(jsonObject));
-                } else {
-                    //No Stock found edge case handled
-                    Log.d(TAG, "Utils : This is null");
-                    return null;
                 }
-
             } else {
                 resultsArray = jsonObject.getJSONObject("results").getJSONArray("quote");
 
                 if (resultsArray != null && resultsArray.length() != 0) {
                     for (int i = 0; i < resultsArray.length(); i++) {
                         jsonObject = resultsArray.getJSONObject(i);
-                        batchOperations.add(buildBatchOperation(jsonObject));
+                        if(!checkForNulls(jsonObject)) {
+                            batchOperations.add(buildBatchOperation(jsonObject));
+                        }
                     }
                 }
             }
@@ -100,7 +88,7 @@ public class Utils {
 
   public static ContentProviderOperation buildBatchOperation(JSONObject jsonObject){
     ContentProviderOperation.Builder builder = ContentProviderOperation.newInsert(
-        QuoteProvider.Quotes.CONTENT_URI);
+            QuoteProvider.Quotes.CONTENT_URI);
     try {
       String change = jsonObject.getString("Change");
       builder.withValue(QuoteColumns.SYMBOL, jsonObject.getString("symbol").toUpperCase());
@@ -130,4 +118,26 @@ public class Utils {
     }
     return builder.build();
   }
+
+    private static boolean checkForNulls(JSONObject jsonObject){
+        String bid_price = null;
+        String change_in_percent = null;
+        if(jsonObject.has("Bid") && jsonObject.has("ChangeinPercent")) {
+            try {
+                bid_price = jsonObject.getString("Bid");
+                change_in_percent = jsonObject.getString("ChangeinPercent");
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+
+        if (!(bid_price.equals("null") || change_in_percent.equals("null"))) {
+            Log.d(TAG, "Utils : This is Not null!!");
+            return false;
+        } else {
+            //No Stock found edge case handled
+            Log.d(TAG, "Utils : This is null");
+            return true;
+        }
+    }
 }
