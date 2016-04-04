@@ -18,13 +18,36 @@
     <item name="android:textColor">#FFF</item>
     <item name="android:textStyle">bold</item>
   </style>
+
   <style name="BidPriceTextStyle">
     <item name="android:textSize">20sp</item>
   </style>
+
   <style name="StockSymbolTextStyle">
     <item name="android:textSize">25sp</item>
     <item name="android:textAllCaps">true</item>
   </style>
+
+  <!--Text Style for no data error Text views in charts-->
+  <style name="NoDataTextStyle">
+    <item name="android:textColor">@color/color_white</item>
+    <item name="android:textSize">15sp</item>
+    <item name="android:textStyle">bold</item>
+  </style>
+
+  <!--Chart Title Text Views Style -->
+  <style name="ChartTitleTextStyle">
+    <item name="android:textColor">@color/color_white</item>
+    <item name="android:textStyle">bold</item>
+  </style>
+
+
+  <style name="WidgetStockNameStyle">
+    <item name="android:textSize">20sp</item>
+    <item name="android:textColor">@color/color_black</item>
+    <item name="android:textStyle">bold</item>
+  </style>
+
   <style name="SettingsDialog" parent="Theme.AppCompat.Dialog">
     <item name="android:windowNoTitle">true</item>
     <item name="android:windowFrame">@null</item>

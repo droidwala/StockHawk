@@ -1,13 +1,54 @@
 <resources>
-  <!-- Default screen margins, per the Android Design guidelines. -->
-  <dimen name="activity_horizontal_margin">16dp</dimen>
-  <dimen name="activity_vertical_margin">16dp</dimen>
+    <!-- Default screen margins, per the Android Design guidelines. -->
+    <dimen name="activity_horizontal_margin">16dp</dimen>
+    <dimen name="activity_vertical_margin">16dp</dimen>
 
-  <!-- Per the design guidelines, navigation drawers should be between 240dp and 320dp:
-         https://developer.android.com/design/patterns/navigation-drawer.html -->
-  <dimen name="navigation_drawer_width">240dp</dimen>
+    <!-- Per the design guidelines, navigation drawers should be between 240dp and 320dp:
+           https://developer.android.com/design/patterns/navigation-drawer.html -->
+    <dimen name="navigation_drawer_width">240dp</dimen>
+    <dimen name="progress_bar_circular_size">48dp</dimen>
+    <dimen name="error_txt_margin">30dp</dimen>
 
-  <dimen name="widget_default_height">200dp</dimen>
-  <dimen name="widget_default_width">200dp</dimen>
-  <dimen name="progress_bar_circular_size">48dp</dimen>
+    <!--Dimensions of activity_my_stocks.xml -->
+    <dimen name="fab_margin">16dp</dimen>
+    <dimen name="retry_btn_margin">25dp</dimen>
+
+    <!--Dimensions of list_item_quote.xml -->
+    <dimen name="list_view_row_margin">16dp</dimen>
+    <dimen name="list_view_row_height">72dp</dimen>
+    <dimen name="bid_price_padding">10dp</dimen>
+    <dimen name="percentage_change_padding">3dp</dimen>
+    
+    <!--Dimensions of stock_detail.xml-->
+    <dimen name="stock_detail_page_toolbar_min_height">200dp</dimen>
+    <dimen name="company_name_margin">15dp</dimen>
+    <dimen name="company_name_txt_size">22sp</dimen>
+    <dimen name="other_toolbar_txt_margin">10dp</dimen>
+    <dimen name="market_cap_txt_margin_top">25dp</dimen>
+    <dimen name="market_cap_txt_size">18sp</dimen>
+    <dimen name="market_cap_value_txt_size">24sp</dimen>
+    <dimen name="weekly_card_height">200dp</dimen>
+    <dimen name="monthly_card_height">250dp</dimen>
+    <dimen name="charts_cardcorner_radius">4dp</dimen>
+    <dimen name="cards_margin">5dp</dimen>
+    <dimen name="chart_margin">16dp</dimen>
+    <dimen name="chart_title_margin">12dp</dimen>
+    <dimen name="drawablePadding">4dp</dimen>
+    
+    <!--Dimensions for tooltips in charts -->
+    <dimen name="tooltip_txt_size">16sp</dimen>
+    <dimen name="tooltip_margin">5dp</dimen>
+    <dimen name="tooltip_padding">5dp</dimen>
+    
+    <!--Dimensions for Widget -->
+    <dimen name="widget_title_txt_size">20sp</dimen>
+    <dimen name="widget_default_height">200dp</dimen>
+    <dimen name="widget_default_width">200dp</dimen>
+    <dimen name="widget_margin">16dp</dimen>
+    <dimen name="widget_row_padding">16dp</dimen>
+    <dimen name="widget_row_height">72dp</dimen>
+    <dimen name="widget_row_bid_padding">10dp</dimen>
+    <dimen name="widget_row_change_padding">3dp</dimen>
+
+
 </resources>

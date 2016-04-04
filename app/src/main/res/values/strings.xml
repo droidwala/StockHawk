@@ -17,6 +17,11 @@
   <string name="no_data">Oops!!Server didn\'t returned anything!</string>
   <string name="week_started">Sorry,the week has just started.\nNo data for current week!</string>
   <string name="no_historical_data">Sorry,no historical data\navailable for this stock</string>
+  <string name="retry_button_txt">RETRY</string>
+  <string name="year_high_txt">Year High</string>
+  <string name="year_low_txt">Year Low</string>
+  <string name="market_value_txt">Total Market Capitalization</string>
+
   <string-array name="intervals">
     <item>5 minutes</item>
     <item>15 minutes(Default)</item>

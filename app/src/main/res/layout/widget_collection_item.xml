@@ -3,48 +3,44 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="72dp"
+    android:layout_height="@dimen/widget_row_height"
     android:gravity="center_vertical"
     android:orientation="horizontal"
-    android:paddingLeft="16dp"
-    android:paddingRight="16dp"
-    android:paddingStart="16dp"
-    android:paddingEnd="16dp">
+    android:paddingLeft="@dimen/widget_row_padding"
+    android:paddingRight="@dimen/widget_row_padding"
+    android:paddingStart="@dimen/widget_row_padding"
+    android:paddingEnd="@dimen/widget_row_padding">
     <TextView
         android:id="@+id/stock_symbol_row_widget"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:gravity="left|center_vertical"
+        android:gravity="start|center_vertical"
         tools:text="GOOG"
-        android:textSize="20sp"
-        android:textColor="@color/color_black"
-        android:textStyle="bold"
-        />
+        style="@style/WidgetStockNameStyle"/>
     <LinearLayout
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
-        android:gravity="right">
+        android:gravity="end">
         <TextView
             android:id="@+id/bid_price_row_widget"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:paddingRight="10sp"
-            android:paddingEnd="10sp"
+            android:paddingRight="@dimen/widget_row_bid_padding"
+            android:paddingEnd="@dimen/widget_row_bid_padding"
             tools:text="1000.00"
             android:textSize="18sp"
             android:textColor="@color/color_black"
-            android:textStyle="bold"
-            />
+            android:textStyle="bold"/>
         <TextView
             android:id="@+id/change_row_widget"
             android:background="@drawable/percent_change_pill"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:paddingLeft="3dp"
-            android:paddingRight="3dp"
-            android:paddingEnd="3dp"
-            android:paddingStart="3dp"
+            android:paddingLeft="@dimen/widget_row_change_padding"
+            android:paddingRight="@dimen/widget_row_change_padding"
+            android:paddingEnd="@dimen/widget_row_change_padding"
+            android:paddingStart="@dimen/widget_row_change_padding"
             tools:text="100%"
             android:textSize="18sp"
             android:textColor="@color/color_white"
