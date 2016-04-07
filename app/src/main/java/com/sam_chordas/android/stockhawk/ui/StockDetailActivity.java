@@ -334,7 +334,7 @@ public class StockDetailActivity extends AppCompatActivity{
     private void InitializingDates(){
         Calendar c = Calendar.getInstance();
         c.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
-        DateFormat df = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+        DateFormat df = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH);
         startDate = df.format(c.getTime());
         c.add(Calendar.DATE, 4);
         endDate = df.format(c.getTime());

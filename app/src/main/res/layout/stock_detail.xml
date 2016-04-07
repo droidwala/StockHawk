@@ -29,6 +29,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/weekly_card_height"
                 android:layout_margin="@dimen/cards_margin"
+                app:cardElevation="@dimen/card_elevation"
                 app:cardCornerRadius="@dimen/charts_cardcorner_radius"
                 app:cardBackgroundColor="@color/weekly_card_background">
                 <FrameLayout
@@ -79,6 +80,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/monthly_card_height"
                 app:cardCornerRadius="@dimen/charts_cardcorner_radius"
+                app:cardElevation="@dimen/card_elevation"
                 android:layout_margin="@dimen/cards_margin"
                 app:cardBackgroundColor="@color/monthly_card_background">
                 <FrameLayout
@@ -127,6 +129,7 @@
                 android:id="@+id/sixty_days_card"
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/monthly_card_height"
+                app:cardElevation="@dimen/card_elevation"
                 app:cardCornerRadius="@dimen/charts_cardcorner_radius"
                 android:layout_margin="@dimen/cards_margin"
                 app:cardBackgroundColor="@color/sixty_days_card_background">

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="weekly_card_height">250dp</dimen>
+    <dimen name="monthly_card_height">300dp</dimen>
+    <dimen name="chart_title_margin">8dp</dimen>
+    <dimen name="chart_margin">32dp</dimen>
+</resources>

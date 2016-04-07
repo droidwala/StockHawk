@@ -34,6 +34,7 @@
     <dimen name="chart_margin">16dp</dimen>
     <dimen name="chart_title_margin">12dp</dimen>
     <dimen name="drawablePadding">4dp</dimen>
+    <dimen name="card_elevation">4dp</dimen>
     
     <!--Dimensions for tooltips in charts -->
     <dimen name="tooltip_txt_size">16sp</dimen>

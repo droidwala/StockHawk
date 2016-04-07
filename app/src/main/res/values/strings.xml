@@ -5,11 +5,11 @@
   <string name="action_change_units">Change Units</string>
   <string name="symbol_search">Symbol Search</string>
   <string name="content_test"> Search for Stock Symbol</string>
-  <string name="input_hint">FB</string>
-  <string name="input_prefill"></string>
+  <string name="input_hint" translatable="false">FB</string>
+  <string name="input_prefill" translatable="false"></string>
   <string name="widget_title">Today\'s Market</string>
   <string name="network_toast">Uh-oh! This app requires an internet connection</string>
-  <string name="fab_btn_description" translatable="false">Search Stock by name </string>
+  <string name="fab_btn_description">Search Stock by name </string>
   <string name="monthly_chart_header">Past 30 days</string>
   <string name="sixty_chart_header">Past 60 days</string>
   <string name="weekly_chart_header">Current Week</string>
@@ -21,6 +21,11 @@
   <string name="year_high_txt">Year High</string>
   <string name="year_low_txt">Year Low</string>
   <string name="market_value_txt">Total Market Capitalization</string>
+  <string name="stock_already_saved">This stock is already saved!</string>
+  <string name="invalid_stock_name">No stock found by that name</string>
+  <string name="server_busy">يبدو الخادم أن يكون مشغولا.
+يرجى المحاولة مرة أخرى بعد مرور بعض الوقت!</string>
+
 
   <string-array name="intervals">
     <item>5 minutes</item>

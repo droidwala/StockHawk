@@ -134,7 +134,7 @@ public class MyStocksActivity extends AppCompatActivity implements LoaderManager
                       new String[] { input.toString().toUpperCase() }, null);
                   if (c.getCount() != 0) {
                     Toast toast =
-                        Toast.makeText(MyStocksActivity.this, "This stock is already saved!",
+                        Toast.makeText(MyStocksActivity.this,getResources().getString(R.string.stock_already_saved),
                             Toast.LENGTH_LONG);
                     toast.setGravity(Gravity.CENTER, Gravity.CENTER, 0);
                     toast.show();
@@ -316,13 +316,12 @@ public class MyStocksActivity extends AppCompatActivity implements LoaderManager
                 error_txt.setVisibility(View.INVISIBLE);
 
             if(intent.getIntExtra("RESULT", 99) == 5) {
-                Toast.makeText(context, "No Stock found by that name", Toast.LENGTH_SHORT).show();
+                Toast.makeText(context,getResources().getString(R.string.invalid_stock_name), Toast.LENGTH_SHORT).show();
             }
             else if(intent.getIntExtra("RESULT",99) == 6){
-                Toast.makeText(context,"Server seems to be busy.Please try again after some time!",Toast.LENGTH_SHORT).show();
+                Toast.makeText(context,getResources().getString(R.string.server_busy),Toast.LENGTH_SHORT).show();
             }
             else if(intent.getIntExtra("RESULT",99) == 7){
-                Log.d(TAG, "New Stock added: Count " + String.valueOf(mCursorAdapter.getItemCount()));
                 recyclerView.smoothScrollToPosition(mCursorAdapter.getItemCount());
                 Intent i = new Intent(QuoteWidgetProvider.STOCK_ADDED_INTENT);
                 sendBroadcast(i);

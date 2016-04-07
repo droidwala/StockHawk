@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="action_example">العمل سبيل المثال</string>
+    <string name="action_settings">إعدادات</string>
+    <string name="action_change_units">وحدات التغيير</string>
+    <string name="symbol_search">بحث رمز</string>
+    <string name="content_test">البحث عن الأوراق المالية رمز</string>
+    <string name="widget_title">سوق اليوم</string>
+    <string name="network_toast">اه اوه! هذا التطبيق يتطلب اتصال بالإنترنت</string>
+    <string name="fab_btn_description">بحث اسهم بالاسم</string>
+    <string name="monthly_chart_header">الماضية 30 يوما</string>
+    <string name="sixty_chart_header">الماضية 60 يوما</string>
+    <string name="weekly_chart_header">الأسبوع الحالي</string>
+    <string name="no_weekly_data">وقد بدأ الأسبوع آسف فقط
+لا توجد بيانات للأسبوع الحالي!</string>
+    <string name="no_data">لم الخادم لا يعود أي شيء</string>
+    <string name="week_started">عذرا، هذا الأسبوع، بدأت للتو
+لا توجد بيانات للأسبوع الحالي!</string>
+    <string name="no_historical_data">آسف، لا توجد بيانات التاريخية
+متاح لهذا المخزون</string>
+    <string name="retry_button_txt">إعادة المحاولة</string>
+    <string name="year_high_txt">ارتفاع العام</string>
+    <string name="year_low_txt">انخفاض العام</string>
+    <string name="market_value_txt">إجمالي القيمة السوقية</string>
+    <string name="stock_already_saved">يتم حفظ هذه الأسهم بالفعل!</string>
+    <string name="invalid_stock_name">لم يتم العثور بهذا الاسم الأسهم</string>
+    <string name="server_busy"></string>
+
+</resources>

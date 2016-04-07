@@ -17,7 +17,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="start|top"
+        android:layout_gravity="end|top"
         android:orientation="vertical">
         <TextView
             android:id="@+id/company_name"
@@ -30,50 +30,50 @@
             android:maxLength="25"
             android:ellipsize="end"
             android:layout_marginTop="@dimen/company_name_margin"/>
-        <LinearLayout
+        <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
+            android:layout_height="wrap_content">
             <TextView
+                android:id="@+id/year_high_txt"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/year_high_txt"
                 android:layout_marginTop="@dimen/other_toolbar_txt_margin"
-                android:textColor="@color/color_white"
-                android:layout_weight="1"/>
+                android:textColor="@color/color_white" />
             <TextView
                 android:id="@+id/year_high_value"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
+                android:layout_toEndOf="@+id/year_high_txt"
+                android:layout_toRightOf="@+id/year_high_txt"
                 android:layout_marginTop="@dimen/other_toolbar_txt_margin"
+                android:layout_marginLeft="10dp"
+                android:layout_marginStart="10dp"
                 tools:text="+ 211.14"
-                android:drawableLeft="@drawable/ic_keyboard_arrow_up_24dp"
-                android:drawableStart="@drawable/ic_keyboard_arrow_up_24dp"
                 android:textColor="@color/color_white"/>
-        </LinearLayout>
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
             <TextView
+                android:id="@+id/year_low_txt"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_alignEnd="@+id/year_high_txt"
+                android:layout_alignRight="@+id/year_high_txt"
+                android:layout_below="@+id/year_high_txt"
                 android:text="@string/year_low_txt"
                 android:layout_marginTop="@dimen/other_toolbar_txt_margin"
-                android:textColor="@color/color_white"
-                android:layout_weight="1"/>
+                android:textColor="@color/color_white"/>
             <TextView
                 android:id="@+id/year_low_value"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
+                android:layout_alignEnd="@+id/year_high_value"
+                android:layout_alignRight="@+id/year_high_value"
+                android:layout_below="@+id/year_high_value"
                 android:layout_marginTop="@dimen/other_toolbar_txt_margin"
-                android:drawableLeft="@drawable/ic_expand_more_24dp"
-                android:drawableStart="@drawable/ic_expand_more_24dp"
+                android:layout_marginLeft="10dp"
+                android:layout_marginStart="10dp"
                 tools:text="- 111.14"
                 android:textColor="@color/color_white"/>
-        </LinearLayout>
+        </RelativeLayout>
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -86,7 +86,7 @@
                 android:layout_marginTop="@dimen/other_toolbar_txt_margin"
                 android:textColor="@color/color_white"
                 android:textSize="@dimen/market_cap_txt_size"
-                android:layout_weight="1"/>
+                android:layout_weight="0.1"/>
             <TextView
                 android:id="@+id/market_value"
                 android:layout_width="wrap_content"
@@ -95,6 +95,8 @@
                 android:layout_marginTop="@dimen/other_toolbar_txt_margin"
                 tools:text="$ 114.34B"
                 android:textSize="@dimen/market_cap_value_txt_size"
+                android:layout_marginEnd="5dp"
+                android:layout_marginRight="5dp"
                 android:textColor="@color/color_white"/>
         </LinearLayout>
     </LinearLayout>
