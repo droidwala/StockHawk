@@ -335,6 +335,7 @@ public class MyStocksActivity extends AppCompatActivity implements LoaderManager
                 //Receives intent when items are removed from recyclerview to overcome existing issue in melnykov's FAB library.
                 if(!fab.isVisible())
                     fab.show();
+                Toast.makeText(context,"Stock Removed from list",Toast.LENGTH_SHORT).show();
             }
 
         }

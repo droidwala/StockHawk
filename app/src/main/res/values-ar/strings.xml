@@ -24,6 +24,11 @@
     <string name="market_value_txt">إجمالي القيمة السوقية</string>
     <string name="stock_already_saved">يتم حفظ هذه الأسهم بالفعل!</string>
     <string name="invalid_stock_name">لم يتم العثور بهذا الاسم الأسهم</string>
-    <string name="server_busy"></string>
+    <string name="server_busy">يبدو الخادم أن يكون مشغولا.
+يرجى المحاولة مرة أخرى بعد مرور بعض الوقت!</string>
+
+    <!--Strings for conent_desc -->
+    <string name="desc_fab">بحث الأوراق المالية من قبل رمز</string>
+    <string name="desc_no_internet">محاولة اتصال</string>
 
 </resources>

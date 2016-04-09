@@ -23,8 +23,7 @@
   <string name="market_value_txt">Total Market Capitalization</string>
   <string name="stock_already_saved">This stock is already saved!</string>
   <string name="invalid_stock_name">No stock found by that name</string>
-  <string name="server_busy">يبدو الخادم أن يكون مشغولا.
-يرجى المحاولة مرة أخرى بعد مرور بعض الوقت!</string>
+  <string name="server_busy">Server seems to be busy.\nPlease try again after some time!</string>
 
 
   <string-array name="intervals">
@@ -34,5 +33,8 @@
     <item>1 hour</item>
   </string-array>
 
+  <!--String values for content_desc -->
+  <string name="desc_fab">Search stock by symbol</string>
+  <string name="desc_no_internet">Retry connection</string>
 
 </resources>

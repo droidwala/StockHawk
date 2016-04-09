@@ -6,11 +6,13 @@ import android.database.Cursor;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Build;
+import android.support.v4.view.accessibility.AccessibilityManagerCompat;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.accessibility.AccessibilityManager;
 import android.widget.TextView;
 
 import com.sam_chordas.android.stockhawk.R;
@@ -32,12 +34,12 @@ public class QuoteCursorAdapter extends CursorRecyclerViewAdapter<QuoteCursorAda
 
   private static Context mContext;
   private static Typeface robotoLight;
-  //private final OnStartDragListener mDragListener;
-  private boolean isPercent;
+  private boolean isTalkBackOn;
   public QuoteCursorAdapter(Context context, Cursor cursor){
     super(context, cursor);
-    //mDragListener = dragListener;
     mContext = context;
+    if(isAccessibilityOn())
+       isTalkBackOn = true;
   }
 
   @Override
@@ -53,7 +55,24 @@ public class QuoteCursorAdapter extends CursorRecyclerViewAdapter<QuoteCursorAda
   public void onBindViewHolder(final ViewHolder viewHolder, final Cursor cursor){
     viewHolder.symbol.setText(cursor.getString(cursor.getColumnIndex("symbol")));
     viewHolder.bidPrice.setText(cursor.getString(cursor.getColumnIndex("bid_price")));
-    int sdk = Build.VERSION.SDK_INT;
+
+    if(isTalkBackOn) {
+      String company_name = cursor.getString(cursor.getColumnIndex("company_name"));
+      String bid_price = cursor.getString(cursor.getColumnIndex("bid_price"));
+      String percent_change = cursor.getString(cursor.getColumnIndex("percent_change"));
+      String change = cursor.getString(cursor.getColumnIndex("change"));
+      viewHolder.symbol.setContentDescription("Stock name is " + company_name + "Move right to know bid price");
+      viewHolder.bidPrice.setContentDescription("Bid price of" + company_name + "stock is" +  bid_price);
+
+
+      if (Utils.showPercent){
+        viewHolder.change.setContentDescription("Percentage Change in " + company_name + "stock is " +  percent_change);
+      } else{
+        viewHolder.change.setContentDescription("Change in stock price is " + company_name + "stock is " + change);
+      }
+
+    }
+      int sdk = Build.VERSION.SDK_INT;
     if (cursor.getInt(cursor.getColumnIndex("is_up")) == 1){
       if (sdk < Build.VERSION_CODES.JELLY_BEAN){
         viewHolder.change.setBackgroundDrawable(
@@ -73,9 +92,12 @@ public class QuoteCursorAdapter extends CursorRecyclerViewAdapter<QuoteCursorAda
     }
     if (Utils.showPercent){
       viewHolder.change.setText(cursor.getString(cursor.getColumnIndex("percent_change")));
-    } else{
+     }
+    else{
       viewHolder.change.setText(cursor.getString(cursor.getColumnIndex("change")));
-    }
+     }
+
+
   }
 
   @Override public void onItemDismiss(int position) {
@@ -86,6 +108,8 @@ public class QuoteCursorAdapter extends CursorRecyclerViewAdapter<QuoteCursorAda
     mContext.getContentResolver().delete(QuoteProvider.Quotes.withSymbol(symbol), null, null);
     notifyItemRemoved(position);
 
+    if(c!=null)
+      c.close();
     //Below broadcast needs to be sent to MyStocksActivity due to existing(below) issue with melynkov's fab button implementation.
     //This is because when FAB is hidden and we are swiping away stocks from the list to the point when scroll bar disappears,
     //it becomes impossible to recover it without switching orientation or restarting the app.
@@ -126,4 +150,10 @@ public class QuoteCursorAdapter extends CursorRecyclerViewAdapter<QuoteCursorAda
     }
 
   }
+
+  private boolean isAccessibilityOn(){
+    AccessibilityManager am = (AccessibilityManager) mContext.getSystemService(Context.ACCESSIBILITY_SERVICE);
+    return am.isEnabled() && am.isTouchExplorationEnabled();
+  }
+
 }
