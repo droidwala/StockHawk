@@ -25,8 +25,8 @@
     <dimen name="company_name_txt_size">22sp</dimen>
     <dimen name="other_toolbar_txt_margin">10dp</dimen>
     <dimen name="market_cap_txt_margin_top">25dp</dimen>
-    <dimen name="market_cap_txt_size">18sp</dimen>
-    <dimen name="market_cap_value_txt_size">24sp</dimen>
+    <dimen name="market_cap_txt_size">16sp</dimen>
+    <dimen name="market_cap_value_txt_size">22sp</dimen>
     <dimen name="weekly_card_height">200dp</dimen>
     <dimen name="monthly_card_height">250dp</dimen>
     <dimen name="charts_cardcorner_radius">4dp</dimen>
@@ -35,7 +35,7 @@
     <dimen name="chart_title_margin">12dp</dimen>
     <dimen name="drawablePadding">4dp</dimen>
     <dimen name="card_elevation">4dp</dimen>
-    
+    <dimen name="stock_toolbar_txt_margins">25dp</dimen>
     <!--Dimensions for tooltips in charts -->
     <dimen name="tooltip_txt_size">16sp</dimen>
     <dimen name="tooltip_margin">5dp</dimen>

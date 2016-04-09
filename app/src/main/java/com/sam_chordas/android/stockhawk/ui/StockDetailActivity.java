@@ -84,12 +84,12 @@ public class StockDetailActivity extends AppCompatActivity{
         stock_name = b.getString("STOCK");
         company_name.setText(b.getString("Name"));
         if(!b.getString("YearLow").equals("null"))
-            year_low.setText(b.getString("YearLow"));
+            year_low.setText("-" + b.getString("YearLow"));
         else
             year_low.setText("NA");
 
         if(!b.getString("YearHigh").equals("null"))
-            year_high.setText(b.getString("YearHigh"));
+            year_high.setText("+" + b.getString("YearHigh"));
         else
             year_high.setText("NA");
 

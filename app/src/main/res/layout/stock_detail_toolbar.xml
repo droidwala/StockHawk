@@ -14,88 +14,81 @@
     android:popupTheme="@style/ThemeOverlay.AppCompat.Light"
     app:layout_scrollFlags="scroll|enterAlways"
     app:elevation="4dp">
-    <LinearLayout
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="start|top"
-        android:orientation="vertical">
+        android:layout_height="match_parent">
         <TextView
             android:id="@+id/company_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_gravity="start|top"
             android:textColor="@color/color_white"
             android:textStyle="bold"
             tools:text="Microsoft Corporation"
             android:textSize="@dimen/company_name_txt_size"
             android:maxLength="25"
-            android:ellipsize="end"
-            android:layout_marginTop="@dimen/company_name_margin"/>
-        <LinearLayout
-            android:layout_width="match_parent"
+            android:ellipsize="end"/>
+        <TextView
+            android:id="@+id/year_high_txt"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="horizontal">
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/year_high_txt"
-                android:layout_marginTop="@dimen/other_toolbar_txt_margin"
-                android:textColor="@color/color_white"
-                android:layout_weight="1"/>
-            <TextView
-                android:id="@+id/year_high_value"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:layout_marginTop="@dimen/other_toolbar_txt_margin"
-                tools:text="+ 211.14"
-                android:drawableLeft="@drawable/ic_keyboard_arrow_up_24dp"
-                android:drawableStart="@drawable/ic_keyboard_arrow_up_24dp"
-                android:textColor="@color/color_white"/>
-        </LinearLayout>
-        <LinearLayout
-            android:layout_width="match_parent"
+            android:text="@string/year_high_txt"
+            android:layout_marginTop="@dimen/other_toolbar_txt_margin"
+            android:textColor="@color/color_white"
+            android:layout_below="@+id/company_name"/>
+        <TextView
+            android:id="@+id/year_high_value"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="horizontal">
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/year_low_txt"
-                android:layout_marginTop="@dimen/other_toolbar_txt_margin"
-                android:textColor="@color/color_white"
-                android:layout_weight="1"/>
-            <TextView
-                android:id="@+id/year_low_value"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:layout_marginTop="@dimen/other_toolbar_txt_margin"
-                android:drawableLeft="@drawable/ic_expand_more_24dp"
-                android:drawableStart="@drawable/ic_expand_more_24dp"
-                tools:text="- 111.14"
-                android:textColor="@color/color_white"/>
-        </LinearLayout>
-        <LinearLayout
-            android:layout_width="match_parent"
+            android:layout_toEndOf="@+id/year_high_txt"
+            android:layout_toRightOf="@+id/year_high_txt"
+            android:layout_alignBaseline="@+id/year_high_txt"
+            tools:text="+211.14"
+            android:layout_marginLeft="@dimen/stock_toolbar_txt_margins"
+            android:layout_marginStart="@dimen/stock_toolbar_txt_margins"
+            android:textColor="@color/color_white"
+            android:textStyle="bold"/>
+        <TextView
+            android:id="@+id/year_low_txt"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_marginTop="@dimen/market_cap_txt_margin_top">
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/market_value_txt"
-                android:layout_marginTop="@dimen/other_toolbar_txt_margin"
-                android:textColor="@color/color_white"
-                android:textSize="@dimen/market_cap_txt_size"
-                android:layout_weight="1"/>
-            <TextView
-                android:id="@+id/market_value"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:layout_marginTop="@dimen/other_toolbar_txt_margin"
-                tools:text="$ 114.34B"
-                android:textSize="@dimen/market_cap_value_txt_size"
-                android:textColor="@color/color_white"/>
-        </LinearLayout>
-    </LinearLayout>
+            android:text="@string/year_low_txt"
+            android:layout_marginTop="@dimen/other_toolbar_txt_margin"
+            android:layout_below="@+id/year_high_txt"
+            android:textColor="@color/color_white" />
+        <TextView
+            android:id="@+id/year_low_value"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toEndOf="@+id/year_low_txt"
+            android:layout_toRightOf="@+id/year_low_txt"
+            android:layout_alignBaseline="@+id/year_low_txt"
+            android:layout_alignLeft="@+id/year_high_value"
+            android:layout_alignStart="@+id/year_high_value"
+            tools:text="-111.14"
+            android:textColor="@color/color_white"
+            android:textStyle="bold"/>
+        <TextView
+            android:id="@+id/market_value_txt"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/market_value_txt"
+            android:layout_marginTop="@dimen/stock_toolbar_txt_margins"
+            android:textColor="@color/color_white"
+            android:textSize="@dimen/market_cap_txt_size"
+            android:layout_below="@+id/year_low_txt"/>
+        <TextView
+            android:id="@+id/market_value"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            tools:text="$ 114.34B"
+            android:textSize="@dimen/market_cap_value_txt_size"
+            android:textColor="@color/color_white"
+            android:textStyle="bold"
+            android:layout_toRightOf="@+id/market_value_txt"
+            android:layout_toEndOf="@+id/market_value_txt"
+            android:layout_alignBaseline="@+id/market_value_txt"
+            android:layout_marginLeft="@dimen/stock_toolbar_txt_margins"
+            android:layout_marginStart="@dimen/stock_toolbar_txt_margins"/>
+    </RelativeLayout>
 </android.support.v7.widget.Toolbar>
