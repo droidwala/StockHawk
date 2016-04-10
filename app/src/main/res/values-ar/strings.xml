@@ -26,6 +26,7 @@
     <string name="invalid_stock_name">لم يتم العثور بهذا الاسم الأسهم</string>
     <string name="server_busy">يبدو الخادم أن يكون مشغولا.
 يرجى المحاولة مرة أخرى بعد مرور بعض الوقت!</string>
+    <string name="updating_stocks">يرجى الانتظار .. الأسهم تحديث</string>
 
     <!--Strings for conent_desc -->
     <string name="desc_fab">بحث الأوراق المالية من قبل رمز</string>

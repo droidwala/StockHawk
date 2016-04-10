@@ -52,10 +52,12 @@ public class MyStocksActivity extends AppCompatActivity implements LoaderManager
   private QuoteCursorAdapter mCursorAdapter;
   private Context mContext;
   private Cursor mCursor;
+  private static Toast progress_toast;
 
   private ProgressBarReceiver receiver;
     RecyclerView recyclerView;
     ProgressBar progressBar;
+    TextView progressbar_txt;
     TextView error_txt;
     Button retry_connection;
     FloatingActionButton fab;
@@ -69,6 +71,7 @@ public class MyStocksActivity extends AppCompatActivity implements LoaderManager
 
     setContentView(R.layout.activity_my_stocks);
       progressBar = (ProgressBar) findViewById(R.id.progressbar);
+      progressbar_txt = (TextView) findViewById(R.id.progressbar_txt);
       error_txt = (TextView) findViewById(R.id.error_txt);
       retry_connection = (Button) findViewById(R.id.retry_connection);
       retry_connection.setOnClickListener(this);
@@ -77,7 +80,7 @@ public class MyStocksActivity extends AppCompatActivity implements LoaderManager
 
     // The intent service is for executing immediate pulls from the Yahoo API
     // GCMTaskService can only schedule tasks, they cannot execute immediately
-    mServiceIntent = new Intent(this, StockIntentService.class);
+      mServiceIntent = new Intent(this, StockIntentService.class);
       //Registering for ProgressBar Receiver
 
       IntentFilter filter = new IntentFilter(ProgressBarReceiver.RECEIVER_NAME);
@@ -143,6 +146,8 @@ public class MyStocksActivity extends AppCompatActivity implements LoaderManager
                     // Add the stock to DB
                     mServiceIntent.putExtra("tag", "add");
                     mServiceIntent.putExtra("symbol", input.toString().toUpperCase());
+                    progress_toast = Toast.makeText(MyStocksActivity.this,"Fetching...Please Wait",Toast.LENGTH_SHORT);
+                    progress_toast.show();
                     startService(mServiceIntent);
                   }
                     if(c!=null)
@@ -173,6 +178,7 @@ public class MyStocksActivity extends AppCompatActivity implements LoaderManager
           .setService(StockTaskService.class)
           .setPeriod(period)
           .setFlex(flex)
+          .setPersisted(true)
           .setTag(periodicTag)
           .setRequiredNetwork(Task.NETWORK_STATE_CONNECTED)
           .setRequiresCharging(false)
@@ -198,14 +204,16 @@ public class MyStocksActivity extends AppCompatActivity implements LoaderManager
             retry_connection.setVisibility(View.INVISIBLE);
             error_txt.setVisibility(View.INVISIBLE);
             progressBar.setVisibility(View.VISIBLE);
-            recyclerView.setVisibility(View.VISIBLE);
-            fab.setVisibility(View.VISIBLE);
+            progressbar_txt.setVisibility(View.VISIBLE);
+            recyclerView.setVisibility(View.INVISIBLE);
+            fab.setVisibility(View.INVISIBLE);
             startService(mServiceIntent);
         }
         else{
             recyclerView.setVisibility(View.INVISIBLE);
             fab.setVisibility(View.INVISIBLE);
             progressBar.setVisibility(View.INVISIBLE);
+            progressbar_txt.setVisibility(View.INVISIBLE);
             retry_connection.setVisibility(View.VISIBLE);
             error_txt.setVisibility(View.VISIBLE);
             error_txt.setText("Seems like you are not connected to internet.\n Please check your network settings!");
@@ -312,6 +320,7 @@ public class MyStocksActivity extends AppCompatActivity implements LoaderManager
         @Override
         public void onReceive(Context context, Intent intent) {
             progressBar.setVisibility(View.INVISIBLE);
+            progressbar_txt.setVisibility(View.INVISIBLE);
             if(error_txt.getVisibility() == View.VISIBLE)
                 error_txt.setVisibility(View.INVISIBLE);
 
@@ -322,12 +331,16 @@ public class MyStocksActivity extends AppCompatActivity implements LoaderManager
                 Toast.makeText(context,getResources().getString(R.string.server_busy),Toast.LENGTH_SHORT).show();
             }
             else if(intent.getIntExtra("RESULT",99) == 7){
+                if(progress_toast!=null)
+                    progress_toast.cancel();
                 recyclerView.smoothScrollToPosition(mCursorAdapter.getItemCount());
                 Intent i = new Intent(QuoteWidgetProvider.STOCK_ADDED_INTENT);
                 sendBroadcast(i);
             }
             else if(intent.getIntExtra("RESULT",99) == 0){
                 Log.d(TAG, "Inside onReceive CAPTAIN!!");
+                recyclerView.setVisibility(View.VISIBLE);
+                fab.setVisibility(View.VISIBLE);
                 Intent i = new Intent(QuoteWidgetProvider.STOCK_UPDATED_INTENT);
                 sendBroadcast(i);
             }

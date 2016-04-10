@@ -24,6 +24,7 @@
   <string name="stock_already_saved">This stock is already saved!</string>
   <string name="invalid_stock_name">No stock found by that name</string>
   <string name="server_busy">Server seems to be busy.\nPlease try again after some time!</string>
+  <string name="updating_stocks">Please wait..Updating Stocks</string>
 
 
   <string-array name="intervals">
