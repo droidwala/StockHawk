@@ -16,10 +16,10 @@ public class StockViewsFactory implements RemoteViewsService.RemoteViewsFactory 
 
     private static final String TAG = "StockViewsFactory";
     private Cursor mCursor;
-    private static String[] symbols;
-    private static String[] percent_changes;
-    private static String[] bid_prices;
-
+    private  String[] symbols;
+    private  String[] percent_changes;
+    private  String[] bid_prices;
+    private  int[] is_up;
     private int appWidgetId;
     private Context mContext;
     public StockViewsFactory(Context context, Intent intent){
@@ -39,7 +39,8 @@ public class StockViewsFactory implements RemoteViewsService.RemoteViewsFactory 
             mCursor.close();
 
         mCursor = mContext.getContentResolver().query(QuoteProvider.Quotes.CONTENT_URI,
-                new String[]{QuoteColumns.SYMBOL,QuoteColumns.BIDPRICE,QuoteColumns.PERCENT_CHANGE},
+                new String[]{QuoteColumns.SYMBOL,QuoteColumns.BIDPRICE,QuoteColumns.PERCENT_CHANGE,
+                        QuoteColumns.ISUP},
                 null,
                 null,
                 null);
@@ -48,6 +49,7 @@ public class StockViewsFactory implements RemoteViewsService.RemoteViewsFactory 
         symbols = new String[count];
         bid_prices = new String[count];
         percent_changes = new String[count];
+        is_up = new int[count];
 
         Log.d(TAG, "onDataSetChanged: Cursor Count " + String.valueOf(symbols.length));
         try{
@@ -57,6 +59,7 @@ public class StockViewsFactory implements RemoteViewsService.RemoteViewsFactory 
                 symbols[pos] = mCursor.getString(mCursor.getColumnIndex(QuoteColumns.SYMBOL));
                 bid_prices[pos] = mCursor.getString(mCursor.getColumnIndex(QuoteColumns.BIDPRICE));
                 percent_changes[pos] = mCursor.getString(mCursor.getColumnIndex(QuoteColumns.PERCENT_CHANGE));
+                is_up[pos] = mCursor.getInt(mCursor.getColumnIndex(QuoteColumns.ISUP));
             }
         }
         finally {
@@ -84,9 +87,15 @@ public class StockViewsFactory implements RemoteViewsService.RemoteViewsFactory 
         remoteViews.setTextViewText(R.id.stock_symbol_row_widget,symbols[position]);
         remoteViews.setTextViewText(R.id.bid_price_row_widget,bid_prices[position]);
         remoteViews.setTextViewText(R.id.change_row_widget,percent_changes[position]);
+        if(is_up[position] == 1)
+        remoteViews.setInt(R.id.change_row_widget,"setBackgroundResource",R.drawable.percent_change_pill_green);
+        else
+        remoteViews.setInt(R.id.change_row_widget,"setBackgroundResource",R.drawable.percent_change_pill_red);
+
 
         return remoteViews;
     }
+
 
     @Override
     public RemoteViews getLoadingView() {
