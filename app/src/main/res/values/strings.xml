@@ -9,6 +9,7 @@
   <string name="input_prefill" translatable="false"></string>
   <string name="widget_title">Today\'s Market</string>
   <string name="network_toast">Uh-oh! This app requires an internet connection</string>
+  <string name="not_connected">"Seems like you are not connected to internet.\n Please check your network settings!"</string>
   <string name="fab_btn_description">Search Stock by name </string>
   <string name="monthly_chart_header">Past 30 days</string>
   <string name="sixty_chart_header">Past 60 days</string>

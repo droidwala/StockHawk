@@ -1,11 +1,15 @@
 package com.sam_chordas.android.stockhawk.ui;
 
+import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -36,7 +40,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Locale;
 
-public class StockDetailActivity extends AppCompatActivity{
+public class StockDetailActivity extends AppCompatActivity implements View.OnClickListener{
 
     private static final String TAG = "StockDetailActivity";
     private final OkHttpClient client = new OkHttpClient();
@@ -46,7 +50,10 @@ public class StockDetailActivity extends AppCompatActivity{
     private Toolbar toolbar;
     private TextView no_weekly_data,no_monthly_data,no_sixty_data;
     private TextView company_name,year_low,year_high,market_value;
+    private TextView error_txt;
+    private Button retry_connection;
     private ProgressBar weekly_progressBar,monthly_progressBar,sixty_progressBar;
+    private CardView weekly_card,monthly_card,sixty_card;
 
     ArrayList<String> weekly_close_amt = new ArrayList<>();//Used to store weekly data
 
@@ -77,6 +84,13 @@ public class StockDetailActivity extends AppCompatActivity{
         monthly_progressBar = (ProgressBar) findViewById(R.id.monthly_progressbar);
         sixty_progressBar = (ProgressBar) findViewById(R.id.sixty_progressbar);
 
+        weekly_card = (CardView) findViewById(R.id.weekly_card);
+        monthly_card = (CardView) findViewById(R.id.monthly_card);
+        sixty_card = (CardView) findViewById(R.id.sixty_days_card);
+
+        error_txt = (TextView) findViewById(R.id.stock_detail_error_txt);
+        retry_connection = (Button) findViewById(R.id.stock_detail_retry_connection);
+        retry_connection.setOnClickListener(this);
 
 
         //Fetching all extras passed in Intent
@@ -102,26 +116,43 @@ public class StockDetailActivity extends AppCompatActivity{
 
         //Initializing all date variables.
         InitializingDates();
-
-        //Create weekly api query for the given stock name
-        try {
-            //Fetching weekly data
-            weekly_progressBar.setVisibility(View.VISIBLE);
-            FetchWeeklyData(GenerateUrl(startDate, endDate));
-
-            //Fetching monthly data
-            monthly_progressBar.setVisibility(View.VISIBLE);
-            FetchMonthlyData(GenerateUrl(past_thirty,today_date));
-
-            //Fetching Sixty days data
-            sixty_progressBar.setVisibility(View.VISIBLE);
-            FetchSixtyData(GenerateUrl(past_sixty,today_date));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        fetchGraphData();
 
     }
 
+    private void fetchGraphData(){
+        if(isConnected()) {
+            //Create weekly api query for the given stock name
+            error_txt.setVisibility(View.GONE);
+            retry_connection.setVisibility(View.GONE);
+            weekly_card.setVisibility(View.VISIBLE);
+            monthly_card.setVisibility(View.VISIBLE);
+            sixty_card.setVisibility(View.VISIBLE);
+            try {
+                //Fetching weekly data
+                weekly_progressBar.setVisibility(View.VISIBLE);
+                FetchWeeklyData(GenerateUrl(startDate, endDate));
+
+                //Fetching monthly data
+                monthly_progressBar.setVisibility(View.VISIBLE);
+                FetchMonthlyData(GenerateUrl(past_thirty, today_date));
+
+                //Fetching Sixty days data
+                sixty_progressBar.setVisibility(View.VISIBLE);
+                FetchSixtyData(GenerateUrl(past_sixty, today_date));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        else{
+            error_txt.setVisibility(View.VISIBLE);
+            retry_connection.setVisibility(View.VISIBLE);
+            weekly_card.setVisibility(View.GONE);
+            monthly_card.setVisibility(View.GONE);
+            sixty_card.setVisibility(View.GONE);
+
+        }
+    }
     public void FetchWeeklyData(String URL) throws IOException{
          Request request = new Request.Builder()
                   .url(URL).build();
@@ -334,7 +365,7 @@ public class StockDetailActivity extends AppCompatActivity{
     private void InitializingDates(){
         Calendar c = Calendar.getInstance();
         c.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
-        DateFormat df = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH);
+        DateFormat df = new SimpleDateFormat("yyyy-MM-dd",Locale.ENGLISH);
         startDate = df.format(c.getTime());
         c.add(Calendar.DATE, 4);
         endDate = df.format(c.getTime());
@@ -352,6 +383,14 @@ public class StockDetailActivity extends AppCompatActivity{
          + " Past Thirty " + past_thirty + "\nPast Sixty " + past_sixty);
 
     }
+
+    private boolean isConnected(){
+        ConnectivityManager cm = (ConnectivityManager) StockDetailActivity.this.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+        return (activeNetwork != null &&
+                activeNetwork.isConnectedOrConnecting());
+    }
+
 
     private String GenerateUrl(String d1,String d2){
         StringBuilder urlString = new StringBuilder();
@@ -405,5 +444,11 @@ public class StockDetailActivity extends AppCompatActivity{
         return  data;
     }
 
+    @Override
+    public void onClick(View view) {
+        if(view.getId()==R.id.stock_detail_retry_connection){
+            fetchGraphData();
+        }
+    }
 }
 

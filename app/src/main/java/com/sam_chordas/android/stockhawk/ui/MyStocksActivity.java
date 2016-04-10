@@ -216,7 +216,7 @@ public class MyStocksActivity extends AppCompatActivity implements LoaderManager
             progressbar_txt.setVisibility(View.INVISIBLE);
             retry_connection.setVisibility(View.VISIBLE);
             error_txt.setVisibility(View.VISIBLE);
-            error_txt.setText("Seems like you are not connected to internet.\n Please check your network settings!");
+            error_txt.setText(getResources().getString(R.string.not_connected));
         }
     }
 

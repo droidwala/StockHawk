@@ -27,6 +27,7 @@
     <dimen name="market_cap_txt_margin_top">25dp</dimen>
     <dimen name="market_cap_txt_size">16sp</dimen>
     <dimen name="market_cap_value_txt_size">22sp</dimen>
+    <dimen name="error_txt_top_margin">40dp</dimen>
     <dimen name="weekly_card_height">200dp</dimen>
     <dimen name="monthly_card_height">250dp</dimen>
     <dimen name="charts_cardcorner_radius">4dp</dimen>

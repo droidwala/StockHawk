@@ -7,6 +7,8 @@
     <string name="content_test">البحث عن الأوراق المالية رمز</string>
     <string name="widget_title">سوق اليوم</string>
     <string name="network_toast">اه اوه! هذا التطبيق يتطلب اتصال بالإنترنت</string>
+    <string name="not_connected">يبدو أنك غير متصل بالإنترنت.
+يرجى التحقق من إعدادات الشبكة</string>
     <string name="fab_btn_description">بحث اسهم بالاسم</string>
     <string name="monthly_chart_header">الماضية 30 يوما</string>
     <string name="sixty_chart_header">الماضية 60 يوما</string>

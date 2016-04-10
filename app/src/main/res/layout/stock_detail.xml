@@ -24,6 +24,29 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
+            <TextView
+                android:id="@+id/stock_detail_error_txt"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/not_connected"
+                android:layout_gravity="center"
+                android:layout_marginTop="@dimen/error_txt_top_margin"
+                android:textStyle="bold"
+                android:visibility="gone"
+                tools:visibility="visible"/>
+            <Button
+                android:id="@+id/stock_detail_retry_connection"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginTop="@dimen/retry_btn_margin"
+                android:text="@string/retry_button_txt"
+                android:background="@color/material_green_700"
+                android:textColor="@color/color_white"
+                android:textStyle="bold"
+                android:visibility="gone"
+                tools:visibility="visible"
+                android:contentDescription="@string/desc_no_internet"/>
             <android.support.v7.widget.CardView
                 android:id="@+id/weekly_card"
                 android:layout_width="match_parent"
