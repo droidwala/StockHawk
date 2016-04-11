@@ -45,6 +45,9 @@ import com.sam_chordas.android.stockhawk.touch_helper.SimpleItemTouchHelperCallb
 import com.sam_chordas.android.stockhawk.widget.IntervalSettingsActivity;
 import com.sam_chordas.android.stockhawk.widget.QuoteWidgetProvider;
 
+/**
+ * MainActivity to display stocks either added by user or pre-defined stocks.
+ */
 public class MyStocksActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor>,View.OnClickListener{
 
   private static final String TAG = "MyStocksActivity";
@@ -56,7 +59,15 @@ public class MyStocksActivity extends AppCompatActivity implements LoaderManager
   private Context mContext;
   private Cursor mCursor;
   private static Toast progress_toast;
-  private static int UPDATE_INTERVAL_REQ_CODE = 1000;
+  private static final int UPDATE_INTERVAL_REQ_CODE = 1000;
+  private static final int DEFAULT_RESULT_CODE = 99;
+
+  private static final int  NO_STOCK_FOUND = 5;
+  private static final int  SERVER_ISSUE = 6;
+  private static final int  NEW_STOCK_ADDED = 7;
+  private static final int  FETCH_ERROR = 2;
+  private static final int  STOCKS_UDPATED = 0;
+  private static final int  STOCK_REMOVED = 299;
 
   private ProgressBarReceiver receiver;
     RecyclerView recyclerView;
@@ -354,17 +365,17 @@ public class MyStocksActivity extends AppCompatActivity implements LoaderManager
             if(error_txt.getVisibility() == View.VISIBLE)
                 error_txt.setVisibility(View.INVISIBLE);
 
-            if(intent.getIntExtra("RESULT", 99) == 5) {
+            if(intent.getIntExtra("RESULT", DEFAULT_RESULT_CODE) == NO_STOCK_FOUND) {
                 Toast.makeText(context,getResources().getString(R.string.invalid_stock_name), Toast.LENGTH_SHORT).show();
             }
-            else if(intent.getIntExtra("RESULT",99) == 2){
+            else if(intent.getIntExtra("RESULT",DEFAULT_RESULT_CODE) == FETCH_ERROR){
                 Toast.makeText(context,getResources().getString(R.string.fetching_error),Toast.LENGTH_SHORT).show();
                 retry_connection.setVisibility(View.VISIBLE);
             }
-            else if(intent.getIntExtra("RESULT",99) == 6){
+            else if(intent.getIntExtra("RESULT",DEFAULT_RESULT_CODE) == SERVER_ISSUE){
                 Toast.makeText(context,getResources().getString(R.string.server_busy),Toast.LENGTH_SHORT).show();
             }
-            else if(intent.getIntExtra("RESULT",99) == 7){
+            else if(intent.getIntExtra("RESULT",DEFAULT_RESULT_CODE) == NEW_STOCK_ADDED){
                 if(no_stocks_txt.getVisibility()==View.VISIBLE)
                     no_stocks_txt.setVisibility(View.INVISIBLE);
                 if(progress_toast!=null)
@@ -375,14 +386,14 @@ public class MyStocksActivity extends AppCompatActivity implements LoaderManager
                 Intent i = new Intent(QuoteWidgetProvider.STOCK_ADDED_INTENT);
                 sendBroadcast(i);
             }
-            else if(intent.getIntExtra("RESULT",99) == 0){
+            else if(intent.getIntExtra("RESULT",DEFAULT_RESULT_CODE) == STOCKS_UDPATED){
                 if(no_stocks_txt.getVisibility()==View.VISIBLE)
                     no_stocks_txt.setVisibility(View.INVISIBLE);
                 fab.setVisibility(View.VISIBLE);
                 Intent i = new Intent(QuoteWidgetProvider.STOCK_UPDATED_INTENT);
                 sendBroadcast(i);
             }
-            else if(intent.getIntExtra("RESULT",99) == 299){
+            else if(intent.getIntExtra("RESULT",DEFAULT_RESULT_CODE) == STOCK_REMOVED){
                 //Receives intent when items are removed from recyclerview to overcome existing issue in melnykov's FAB library.
                 if(intent.getBooleanExtra("EMPTY",false)){
                     no_stocks_txt.setVisibility(View.VISIBLE);
