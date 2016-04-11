@@ -57,8 +57,7 @@ public class MyStocksActivity extends AppCompatActivity implements LoaderManager
   private ProgressBarReceiver receiver;
     RecyclerView recyclerView;
     ProgressBar progressBar;
-    TextView progressbar_txt;
-    TextView error_txt;
+    TextView error_txt,no_stocks_txt;
     Button retry_connection;
     FloatingActionButton fab;
     ConnectivityManager cm;
@@ -71,8 +70,8 @@ public class MyStocksActivity extends AppCompatActivity implements LoaderManager
 
     setContentView(R.layout.activity_my_stocks);
       progressBar = (ProgressBar) findViewById(R.id.progressbar);
-      progressbar_txt = (TextView) findViewById(R.id.progressbar_txt);
       error_txt = (TextView) findViewById(R.id.error_txt);
+      no_stocks_txt = (TextView) findViewById(R.id.no_stock_txt);
       retry_connection = (Button) findViewById(R.id.retry_connection);
       retry_connection.setOnClickListener(this);
       recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
@@ -204,8 +203,6 @@ public class MyStocksActivity extends AppCompatActivity implements LoaderManager
             retry_connection.setVisibility(View.INVISIBLE);
             error_txt.setVisibility(View.INVISIBLE);
             progressBar.setVisibility(View.VISIBLE);
-            progressbar_txt.setVisibility(View.VISIBLE);
-            recyclerView.setVisibility(View.INVISIBLE);
             fab.setVisibility(View.INVISIBLE);
             startService(mServiceIntent);
         }
@@ -213,7 +210,6 @@ public class MyStocksActivity extends AppCompatActivity implements LoaderManager
             recyclerView.setVisibility(View.INVISIBLE);
             fab.setVisibility(View.INVISIBLE);
             progressBar.setVisibility(View.INVISIBLE);
-            progressbar_txt.setVisibility(View.INVISIBLE);
             retry_connection.setVisibility(View.VISIBLE);
             error_txt.setVisibility(View.VISIBLE);
             error_txt.setText(getResources().getString(R.string.not_connected));
@@ -296,7 +292,9 @@ public class MyStocksActivity extends AppCompatActivity implements LoaderManager
 
   @Override
   public void onLoadFinished(Loader<Cursor> loader, Cursor data){
+
     mCursorAdapter.swapCursor(data);
+    Log.d(TAG, "onLoadFinished: called" + String.valueOf(mCursorAdapter.getItemCount()));
     mCursor = data;
   }
 
@@ -320,7 +318,6 @@ public class MyStocksActivity extends AppCompatActivity implements LoaderManager
         @Override
         public void onReceive(Context context, Intent intent) {
             progressBar.setVisibility(View.INVISIBLE);
-            progressbar_txt.setVisibility(View.INVISIBLE);
             if(error_txt.getVisibility() == View.VISIBLE)
                 error_txt.setVisibility(View.INVISIBLE);
 
@@ -331,21 +328,31 @@ public class MyStocksActivity extends AppCompatActivity implements LoaderManager
                 Toast.makeText(context,getResources().getString(R.string.server_busy),Toast.LENGTH_SHORT).show();
             }
             else if(intent.getIntExtra("RESULT",99) == 7){
+                if(no_stocks_txt.getVisibility()==View.VISIBLE)
+                    no_stocks_txt.setVisibility(View.INVISIBLE);
                 if(progress_toast!=null)
                     progress_toast.cancel();
+                if(!fab.isVisible())
+                    fab.show();
                 recyclerView.smoothScrollToPosition(mCursorAdapter.getItemCount());
                 Intent i = new Intent(QuoteWidgetProvider.STOCK_ADDED_INTENT);
                 sendBroadcast(i);
             }
             else if(intent.getIntExtra("RESULT",99) == 0){
-                Log.d(TAG, "Inside onReceive CAPTAIN!!");
-                recyclerView.setVisibility(View.VISIBLE);
+                if(no_stocks_txt.getVisibility()==View.VISIBLE)
+                    no_stocks_txt.setVisibility(View.INVISIBLE);
                 fab.setVisibility(View.VISIBLE);
                 Intent i = new Intent(QuoteWidgetProvider.STOCK_UPDATED_INTENT);
                 sendBroadcast(i);
             }
             else if(intent.getIntExtra("RESULT",99) == 299){
                 //Receives intent when items are removed from recyclerview to overcome existing issue in melnykov's FAB library.
+                if(intent.getBooleanExtra("EMPTY",false)){
+                    no_stocks_txt.setVisibility(View.VISIBLE);
+                }
+                else {
+                    no_stocks_txt.setVisibility(View.INVISIBLE);
+                }
                 if(!fab.isVisible())
                     fab.show();
                 Toast.makeText(context,"Stock Removed from list",Toast.LENGTH_SHORT).show();

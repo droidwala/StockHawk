@@ -26,6 +26,7 @@ import com.sam_chordas.android.stockhawk.widget.QuoteWidgetProvider;
 public class QuoteCursorAdapter extends CursorRecyclerViewAdapter<QuoteCursorAdapter.ViewHolder>
     implements ItemTouchHelperAdapter{
 
+  private static final String TAG = "QuoteCursorAdapter";
   private static Context mContext;
   private static Typeface robotoLight;
   private boolean isTalkBackOn;
@@ -101,22 +102,22 @@ public class QuoteCursorAdapter extends CursorRecyclerViewAdapter<QuoteCursorAda
     c.moveToPosition(position);
     String symbol = c.getString(c.getColumnIndex(QuoteColumns.SYMBOL));
     Log.d("SwipeRemove", "Removing Stock : " + symbol);
-    mContext.getContentResolver().delete(QuoteProvider.Quotes.withSymbol(symbol), null, null);
+    mContext.getContentResolver().delete(QuoteProvider.Quotes.CONTENT_URI,QuoteColumns.SYMBOL + "=?",new String[]{symbol});
     notifyItemRemoved(position);
-
-    if(c!=null)
-      c.close();
     //Below broadcast needs to be sent to MyStocksActivity due to existing(below) issue with melynkov's fab button implementation.
     //This is because when FAB is hidden and we are swiping away stocks from the list to the point when scroll bar disappears,
     //it becomes impossible to recover it without switching orientation or restarting the app.
     //Please refer Issue #168 --> https://github.com.makovkastar/FloatingActionButton/issues/186 for more information
+
     Intent intent = new Intent(MyStocksActivity.ProgressBarReceiver.RECEIVER_NAME);
     intent.putExtra("RESULT", 299);
+    if(c.getCount()==1)
+        intent.putExtra("EMPTY",true);
     mContext.sendBroadcast(intent);
-
   }
 
-  @Override public int getItemCount() {
+  @Override
+  public int getItemCount() {
     return super.getItemCount();
   }
 
