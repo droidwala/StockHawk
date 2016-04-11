@@ -20,21 +20,13 @@ public class QuoteWidgetProvider extends AppWidgetProvider {
     public static final String STOCK_ADDED_INTENT = "com.sam_chordas.android.stockhawk.stock_added";
     public static final String STOCK_UPDATED_INTENT = "com.sam_chordas.android.stockhawk.stock_updated";
     public static final String STOCK_REMOVED_INTENT = "com.sam_chordas.android.stockhawk.stock_removed";
-    public static final String ALARM_UPDATE = "com.sam_chordas.android.stockhawk.alarm_update";
-    public static final String INTERVAL_CHANGE = "com.sam_chordas.android.stockhawk.interval_change";
 
     @Override
     public void onReceive(Context context, Intent intent) {
         Log.d(TAG, "onReceive: " + intent.getAction());
         if(intent.getAction() == STOCK_ADDED_INTENT || intent.getAction() == STOCK_UPDATED_INTENT
-                || intent.getAction() == STOCK_REMOVED_INTENT || intent.getAction() == ALARM_UPDATE){
+                || intent.getAction() == STOCK_REMOVED_INTENT){
             onUpdate(context);
-        }
-        else if(intent.getAction()==INTERVAL_CHANGE){
-            Bundle b = intent.getExtras();
-            long interval = b.getLong("Interval");
-            Log.d(TAG, "onReceive: " + String.valueOf(interval));
-            onUpdate(context,interval);
         }
         else{
             super.onReceive(context, intent);
@@ -50,12 +42,6 @@ public class QuoteWidgetProvider extends AppWidgetProvider {
             onUpdate(context, appWidgetManager, appWidgetIds);
         }
     }
-
-    private void onUpdate(Context context,long interval){
-        Log.d(TAG, "Interval Settings Changed" + String.valueOf(interval));
-        AlarmUtil.scheduleUpdate(context,interval);
-    }
-
 
     @Override
     public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
@@ -75,7 +61,6 @@ public class QuoteWidgetProvider extends AppWidgetProvider {
             appWidgetManager.updateAppWidget(appWidgetIds[i], widget);
             Log.d(TAG, "After UpdateAppWidget Call ");
 
-            //Not handling row clicks currently
         }
     }
 
@@ -84,12 +69,10 @@ public class QuoteWidgetProvider extends AppWidgetProvider {
     @Override
     public void onEnabled(Context context) {
         Log.d(TAG, "App Widget Created " );
-        AlarmUtil.scheduleUpdate(context);
     }
 
     @Override
     public void onDisabled(Context context) {
-        AlarmUtil.clearUpdate(context);
     }
 
     @Override

@@ -160,7 +160,12 @@ public class StockTaskService extends GcmTaskService{
           }
           else{
             if(isSuccessful) {
-              result = NO_STOCK_FOUND;
+              if(isUpdate){
+                result = GcmNetworkManager.RESULT_FAILURE ;
+              }
+              else {
+                result = NO_STOCK_FOUND;
+              }
             }
             else{
               result = SERVER_ISSUE;

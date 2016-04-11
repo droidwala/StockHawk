@@ -7,9 +7,11 @@ import android.content.CursorLoader;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.Loader;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.app.ActionBar;
 import android.os.Bundle;
@@ -40,6 +42,7 @@ import com.google.android.gms.gcm.PeriodicTask;
 import com.google.android.gms.gcm.Task;
 import com.melnykov.fab.FloatingActionButton;
 import com.sam_chordas.android.stockhawk.touch_helper.SimpleItemTouchHelperCallback;
+import com.sam_chordas.android.stockhawk.widget.IntervalSettingsActivity;
 import com.sam_chordas.android.stockhawk.widget.QuoteWidgetProvider;
 
 public class MyStocksActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor>,View.OnClickListener{
@@ -53,6 +56,7 @@ public class MyStocksActivity extends AppCompatActivity implements LoaderManager
   private Context mContext;
   private Cursor mCursor;
   private static Toast progress_toast;
+  private static int UPDATE_INTERVAL_REQ_CODE = 1000;
 
   private ProgressBarReceiver receiver;
     RecyclerView recyclerView;
@@ -67,7 +71,6 @@ public class MyStocksActivity extends AppCompatActivity implements LoaderManager
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     mContext = this;
-
     setContentView(R.layout.activity_my_stocks);
       progressBar = (ProgressBar) findViewById(R.id.progressbar);
       error_txt = (TextView) findViewById(R.id.error_txt);
@@ -167,7 +170,8 @@ public class MyStocksActivity extends AppCompatActivity implements LoaderManager
 
     mTitle = getTitle();
     if (CheckConnection()){
-      long period = 1800L;
+      SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+      long period = preferences.getLong(IntervalSettingsActivity.PREF_NAME,180L);
       long flex = 10L;
       String periodicTag = "periodic";
 
@@ -179,12 +183,14 @@ public class MyStocksActivity extends AppCompatActivity implements LoaderManager
           .setFlex(flex)
           .setPersisted(true)
           .setTag(periodicTag)
+          .setUpdateCurrent(true)
           .setRequiredNetwork(Task.NETWORK_STATE_CONNECTED)
           .setRequiresCharging(false)
           .build();
       // Schedule task with tag "periodic." This ensure that only the stocks present in the DB
       // are updated.
       GcmNetworkManager.getInstance(this).schedule(periodicTask);
+
     }
 
 
@@ -263,6 +269,8 @@ public class MyStocksActivity extends AppCompatActivity implements LoaderManager
 
     //noinspection SimplifiableIfStatement
     if (id == R.id.action_settings) {
+      Intent i = new Intent(MyStocksActivity.this, IntervalSettingsActivity.class);
+      startActivityForResult(i,UPDATE_INTERVAL_REQ_CODE);
       return true;
     }
 
@@ -275,7 +283,32 @@ public class MyStocksActivity extends AppCompatActivity implements LoaderManager
     return super.onOptionsItemSelected(item);
   }
 
-  @Override
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        long flex = 10L;
+        String periodicTag = "periodic";
+        if(requestCode==UPDATE_INTERVAL_REQ_CODE){
+            if(resultCode==RESULT_OK){
+                long period = data.getExtras().getLong("Interval") * 60;
+                Log.d(TAG, "onActivityResult: " + String.valueOf(period));
+                PeriodicTask periodicTask = new PeriodicTask.Builder()
+                        .setService(StockTaskService.class)
+                        .setPeriod(period)
+                        .setFlex(flex)
+                        .setPersisted(true)
+                        .setTag(periodicTag)
+                        .setUpdateCurrent(true)
+                        .setRequiredNetwork(Task.NETWORK_STATE_CONNECTED)
+                        .setRequiresCharging(false)
+                        .build();
+
+                GcmNetworkManager.getInstance(this).schedule(periodicTask);
+            }
+        }
+    }
+
+    @Override
   public Loader<Cursor> onCreateLoader(int id, Bundle args){
     // This narrows the return to only the stocks that are most current.
       //Since we aren't building history data ourself locally but relying on historical table
@@ -323,6 +356,9 @@ public class MyStocksActivity extends AppCompatActivity implements LoaderManager
 
             if(intent.getIntExtra("RESULT", 99) == 5) {
                 Toast.makeText(context,getResources().getString(R.string.invalid_stock_name), Toast.LENGTH_SHORT).show();
+            }
+            else if(intent.getIntExtra("RESULT",99) == 2){
+                Toast.makeText(context,"Weirdo!!Server returned some junk!",Toast.LENGTH_SHORT).show();
             }
             else if(intent.getIntExtra("RESULT",99) == 6){
                 Toast.makeText(context,getResources().getString(R.string.server_busy),Toast.LENGTH_SHORT).show();

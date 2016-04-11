@@ -54,8 +54,6 @@
                 <action android:name="com.sam_chordas.android.stockhawk.stock_added"/>
                 <action android:name="com.sam_chordas.android.stockhawk.stock_updated"/>
                 <action android:name="com.sam_chordas.android.stockhawk.stock_removed"/>
-                <action android:name="com.sam_chordas.android.stockhawk.alarm_update"/>
-                <action android:name="com.sam_chordas.android.stockhawk.interval_change"/>
             </intent-filter>
             <meta-data android:name="android.appwidget.provider"
                 android:resource="@xml/widget_info"/>
