@@ -41,4 +41,7 @@ Please try again!</string>
   <string name="desc_fab">Search stock by symbol</string>
   <string name="desc_no_internet">Retry connection</string>
 
+  <!--Interval settings dialog related strings -->
+  <string name="interval_dialog_title">Choose Refresh Interval</string>
+  <string name="interval_positive_txt">OK</string>
 </resources>

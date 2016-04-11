@@ -36,8 +36,22 @@
 البيانات في رسم بياني.
 يرجى التحقق من الاتصال بالشبكة
 وإعادة إطلاق هذه الشاشة مرة أخرى</string>
-    <!--Strings for conent_desc -->
+
+
+    <string-array name="intervals">
+        <item>5 دقيقة</item>
+        <item>15 دقيقة (الافتراضي)</item>
+        <item>30 دقيقة</item>
+        <item>1 ساعة</item>
+    </string-array>
+
+
+    <!--Strings for content_desc -->
     <string name="desc_fab">بحث الأوراق المالية من قبل رمز</string>
     <string name="desc_no_internet">محاولة اتصال</string>
 
+
+    <!--Interval settings dialog related strings -->
+    <string name="interval_dialog_title">اختيار الفاصل الزمني للتحديث</string>
+    <string name="interval_positive_txt">حسنا</string>
 </resources>

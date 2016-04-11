@@ -28,7 +28,7 @@ public class IntervalSettingsActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         final SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
         new MaterialDialog.Builder(this)
-                .title("Choose Refresh Interval")
+                .title(R.string.interval_dialog_title)
                 .items(R.array.intervals)
                 .theme(Theme.LIGHT)
                 .dismissListener(new DialogInterface.OnDismissListener() {
@@ -56,7 +56,7 @@ public class IntervalSettingsActivity extends AppCompatActivity {
                         return true;
                     }
                 })
-                .positiveText("OK")
+                .positiveText(R.string.interval_positive_txt)
                 .show();
     }
 }
