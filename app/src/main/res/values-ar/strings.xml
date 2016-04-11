@@ -30,6 +30,8 @@
 يرجى المحاولة مرة أخرى بعد مرور بعض الوقت!</string>
     <string name="no_stocks">يوجد مخزون أضافت في القائمة.
 البدء في إضافة الأسهم!</string>
+    <string name="fetching_error">حدث خطأ أثناء جلب البيانات.
+حاول مرة اخرى!</string>
 
     <!--Strings for conent_desc -->
     <string name="desc_fab">بحث الأوراق المالية من قبل رمز</string>

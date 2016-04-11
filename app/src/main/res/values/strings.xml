@@ -26,6 +26,8 @@
   <string name="invalid_stock_name">No stock found by that name</string>
   <string name="server_busy">Server seems to be busy.\nPlease try again after some time!</string>
   <string name="no_stocks">No stocks added in the list.\n\t\tStart adding stocks! :)</string>
+  <string name="fetching_error">Error occurred while fetching data.
+Please try again!</string>
 
 
   <string-array name="intervals">

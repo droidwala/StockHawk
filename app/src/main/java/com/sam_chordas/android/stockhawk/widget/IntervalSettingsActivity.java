@@ -16,7 +16,8 @@ import com.sam_chordas.android.stockhawk.R;
 
 public class IntervalSettingsActivity extends AppCompatActivity {
 
-    public static final String PREF_NAME = "INTERVAL_PREF";
+    public static final String PREF_DIALOG_NUM = "DIALOG_PREF_NUM";
+    public static final String PREF_TIME ="INTERVAL_PREF_TIME";
     private static final String TAG = "IntervalSettings";
     static long[] intervals ={5,15,30,60};
     @Override
@@ -33,11 +34,12 @@ public class IntervalSettingsActivity extends AppCompatActivity {
                         finish();
                     }
                 })
-                .itemsCallbackSingleChoice((int) preferences.getLong(PREF_NAME, 1), new MaterialDialog.ListCallbackSingleChoice() {
+                .itemsCallbackSingleChoice((int) preferences.getLong(PREF_DIALOG_NUM, 1), new MaterialDialog.ListCallbackSingleChoice() {
                     @Override
                     public boolean onSelection(MaterialDialog dialog, View itemView, int which, CharSequence text) {
                         SharedPreferences.Editor editor = preferences.edit();
-                        editor.putLong(PREF_NAME, which);
+                        editor.putLong(PREF_TIME, intervals[which]);
+                        editor.putLong(PREF_DIALOG_NUM,which);
                         editor.apply();
 
                         Intent task_update_intent = new Intent();

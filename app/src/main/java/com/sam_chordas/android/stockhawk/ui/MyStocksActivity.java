@@ -171,7 +171,7 @@ public class MyStocksActivity extends AppCompatActivity implements LoaderManager
     mTitle = getTitle();
     if (CheckConnection()){
       SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
-      long period = preferences.getLong(IntervalSettingsActivity.PREF_NAME,180L);
+      long period = preferences.getLong(IntervalSettingsActivity.PREF_TIME,15L) * 60;
       long flex = 10L;
       String periodicTag = "periodic";
 
@@ -358,7 +358,8 @@ public class MyStocksActivity extends AppCompatActivity implements LoaderManager
                 Toast.makeText(context,getResources().getString(R.string.invalid_stock_name), Toast.LENGTH_SHORT).show();
             }
             else if(intent.getIntExtra("RESULT",99) == 2){
-                Toast.makeText(context,"Weirdo!!Server returned some junk!",Toast.LENGTH_SHORT).show();
+                Toast.makeText(context,getResources().getString(R.string.fetching_error),Toast.LENGTH_SHORT).show();
+                retry_connection.setVisibility(View.VISIBLE);
             }
             else if(intent.getIntExtra("RESULT",99) == 6){
                 Toast.makeText(context,getResources().getString(R.string.server_busy),Toast.LENGTH_SHORT).show();
