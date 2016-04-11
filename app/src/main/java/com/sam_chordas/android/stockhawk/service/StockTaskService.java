@@ -1,18 +1,13 @@
 package com.sam_chordas.android.stockhawk.service;
 
-import android.appwidget.AppWidgetProvider;
 import android.content.ContentProviderOperation;
-import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.OperationApplicationException;
 import android.database.Cursor;
 import android.database.DatabaseUtils;
-import android.os.Handler;
-import android.os.Looper;
 import android.os.RemoteException;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.google.android.gms.gcm.GcmNetworkManager;
 import com.google.android.gms.gcm.GcmTaskService;
@@ -24,19 +19,21 @@ import com.sam_chordas.android.stockhawk.widget.QuoteWidgetProvider;
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
 import com.squareup.okhttp.Response;
+
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 
 /**
- * Created by sam_chordas on 9/30/15.
+ *
  * The GCMTask service is primarily for periodic tasks. However, OnRunTask can be called directly
  * and is used for the initialization and adding task as well.
  */
 public class StockTaskService extends GcmTaskService{
 
   private static final String TAG = "StockTaskService";
+  //Constants indicating various conditions we could get while parsing response received
   private static final int NO_STOCK_FOUND = 5;
   private static final int SERVER_ISSUE = 6;
   private static final int NEW_STOCK_ADDED = 7;
@@ -45,14 +42,15 @@ public class StockTaskService extends GcmTaskService{
   private OkHttpClient client = new OkHttpClient();
   private Context mContext;
   private StringBuilder mStoredSymbols = new StringBuilder();
-  private boolean isUpdate;
-  private boolean isSuccessful;
+  private boolean isUpdate; // indicating whether we are updating values of existing stocks or not
+  private boolean isSuccessful;//indicated whether Json response was received or not
 
   public StockTaskService(){}
 
   public StockTaskService(Context context){
     mContext = context;
   }
+  //Synchronous REST API call
   String fetchData(String url) throws IOException{
     Request request = new Request.Builder()
         .url(url)
@@ -85,7 +83,7 @@ public class StockTaskService extends GcmTaskService{
           new String[] { "Distinct " + QuoteColumns.SYMBOL }, null,
           null, null);
       if (initQueryCursor.getCount() == 0 || initQueryCursor == null){
-        // Init task. Populates DB with quotes for the symbols seen below
+        // Init task. Populates DB with quotes for the symbols seen below in event db/list is empty
         try {
           urlStringBuilder.append(
               URLEncoder.encode("\"YHOO\",\"AAPL\",\"GOOG\",\"MSFT\")", "UTF-8"));
@@ -94,6 +92,8 @@ public class StockTaskService extends GcmTaskService{
         }
       }
       else if (initQueryCursor != null){
+        // If values are already present in db..Then we extract symbol names of the stock
+        // And generate rest api url with those stocks include in where clause
         DatabaseUtils.dumpCursor(initQueryCursor);
         initQueryCursor.moveToFirst();
         for (int i = 0; i < initQueryCursor.getCount(); i++){
@@ -114,6 +114,7 @@ public class StockTaskService extends GcmTaskService{
       }
     }
     else if (params.getTag().equals("add")){
+      //Called when user is try to add stocks to the list.
       isUpdate = false;
       // get symbol from params.getExtra and build query
       String stockInput = params.getExtras().getString("symbol");
@@ -140,11 +141,11 @@ public class StockTaskService extends GcmTaskService{
         Log.d(TAG, "onRunTask: Response " + getResponse);
 
         try {
-          ArrayList<ContentProviderOperation> batchOperations = new ArrayList<>();
+          ArrayList<ContentProviderOperation> batchOperations;
           batchOperations = Utils.quoteJsonToContentVals(getResponse);
           if(batchOperations!=null && batchOperations.size()>0) {
-            Log.d(TAG, "Response Result : Not null");
-            // No more is_Current column logic
+            //Indicates response was parsed properly and the contentprovideroperations arraylist
+            //received is legit
             if (isUpdate) {
                 Log.d(TAG, "Deleting Existing Stock to avoid duplicates");
                 result = GcmNetworkManager.RESULT_SUCCESS;
@@ -153,12 +154,12 @@ public class StockTaskService extends GcmTaskService{
             else{
                 result = NEW_STOCK_ADDED;
             }
-
-              mContext.getContentResolver().applyBatch(QuoteProvider.AUTHORITY,
+            //Adds stocks to db in batches
+            mContext.getContentResolver().applyBatch(QuoteProvider.AUTHORITY,
                       batchOperations);
-
           }
           else{
+            //when batchoperations arraylist is null indicating error is response received..
             if(isSuccessful) {
               if(isUpdate){
                 result = GcmNetworkManager.RESULT_FAILURE ;
@@ -184,6 +185,7 @@ public class StockTaskService extends GcmTaskService{
 
       if(isUpdate && params.getTag().equals("periodic")){
           //send broadcast to update our stock hawk widget
+          //whenever DB is updated by periodic task service with latest values
           Intent i = new Intent(QuoteWidgetProvider.STOCK_UPDATED_INTENT);
           mContext.sendBroadcast(i);
       }

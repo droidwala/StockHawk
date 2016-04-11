@@ -80,6 +80,7 @@ public class StockViewsFactory implements RemoteViewsService.RemoteViewsFactory 
         return symbols.length;
     }
 
+    //Functions same as getView() behaves in adapter classes
     @Override
     public RemoteViews getViewAt(int position) {
         RemoteViews remoteViews  = new RemoteViews(mContext.getPackageName(), R.layout.widget_collection_item);
@@ -87,12 +88,12 @@ public class StockViewsFactory implements RemoteViewsService.RemoteViewsFactory 
         remoteViews.setTextViewText(R.id.stock_symbol_row_widget,symbols[position]);
         remoteViews.setTextViewText(R.id.bid_price_row_widget,bid_prices[position]);
         remoteViews.setTextViewText(R.id.change_row_widget,percent_changes[position]);
-        if(is_up[position] == 1)
-        remoteViews.setInt(R.id.change_row_widget,"setBackgroundResource",R.drawable.percent_change_pill_green);
-        else
-        remoteViews.setInt(R.id.change_row_widget,"setBackgroundResource",R.drawable.percent_change_pill_red);
-
-
+        if(is_up[position] == 1) {
+            remoteViews.setInt(R.id.change_row_widget, "setBackgroundResource", R.drawable.percent_change_pill_green);
+        }
+        else {
+            remoteViews.setInt(R.id.change_row_widget, "setBackgroundResource", R.drawable.percent_change_pill_red);
+        }
         return remoteViews;
     }
 

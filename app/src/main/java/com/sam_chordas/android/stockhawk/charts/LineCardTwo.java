@@ -22,6 +22,9 @@ import com.sam_chordas.android.stockhawk.R;
 
 import java.util.ArrayList;
 
+/**
+ * Used to plot past thirty days data
+ */
 public class LineCardTwo {
 
 
@@ -51,16 +54,16 @@ public class LineCardTwo {
         MinMaxAndStepLogic();
     }
 
+    //Used to get min,max and step value to plot the graph
     private void MinMaxAndStepLogic(){
         min_value = (int) MinMaxHelper.getMin_value(values);
         max_value = (int) MinMaxHelper.getMax_value(values);
         MIN = MinMaxHelper.getMinGraphValue(min_value);
         MAX = MinMaxHelper.getMaxGraphValue(max_value);
         STEP = MinMaxHelper.GCD(MAX,MIN);
-
-        Log.d(TAG, "LineCardTwo: " + String.valueOf(MIN) );
     }
 
+    //Setting up Line Chart
     public void show(){
         LineSet dataSet = new LineSet(labels,values);
         dataSet.setColor(Color.parseColor("#53c1bd"))
@@ -76,9 +79,6 @@ public class LineCardTwo {
                 .setLabelsColor(Color.parseColor("#FFFFFF"))
                 .setXAxis(true)
                 .setYAxis(true);
-        Log.d(TAG, "show: " + "MIN " + String.valueOf(MIN) +
-                " \nMAX " + String.valueOf(MAX) +
-                " \nSTEP " + String.valueOf(STEP));
 
         if(MIN > 0 && MAX > 0) //For cases where stock price is less than 1 don't set up axisbordervalues instead use default ones.
         mChart.setAxisBorderValues(MIN, MAX, STEP);

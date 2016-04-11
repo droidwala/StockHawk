@@ -2,6 +2,9 @@ package com.sam_chordas.android.stockhawk.pojo;
 
 import java.util.List;
 
+/**
+ * Used to store values parsed in JSON(using GSON parsing)
+ */
 public class History {
 
     /**

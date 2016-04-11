@@ -19,6 +19,9 @@ import com.sam_chordas.android.stockhawk.R;
 
 import java.util.ArrayList;
 
+/**
+ * Used to plot past sixty days data
+ */
 public class LineCardThree {
 
 
@@ -59,6 +62,7 @@ public class LineCardThree {
 
         Log.d(TAG, "LineCardTwo: " + String.valueOf(MIN));
     }
+
     public void show(){
         LineSet dataSet = new LineSet(labels,values);
         dataSet.setColor(Color.parseColor("#ad4b4b"))

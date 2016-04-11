@@ -1,5 +1,8 @@
 package com.sam_chordas.android.stockhawk.pojo;
 
+/**
+ * Used to store values parsed in JSON(using GSON parsing) when result_count is 1 in response received.
+ */
 public class OneDayHistory {
 
     /**

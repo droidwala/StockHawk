@@ -14,7 +14,7 @@ import java.util.ArrayList;
 import java.util.Locale;
 
 /**
- * Created by sam_chordas on 10/8/15.
+ * Parses Json response and accordingly generates arraylist of ContentProviderOperation
  */
 public class Utils {
 
@@ -27,22 +27,22 @@ public class Utils {
     ArrayList<ContentProviderOperation> batchOperations = new ArrayList<>();
     JSONObject jsonObject = null;
     JSONArray resultsArray = null;
-    Log.i(LOG_TAG, "GET FB: " + JSON);
     try{
       jsonObject = new JSONObject(JSON);
       if (jsonObject != null && jsonObject.length() != 0){
         jsonObject = jsonObject.optJSONObject("query");
         if(jsonObject !=null) {
             int count = Integer.parseInt(jsonObject.optString("count"));
+            //Parse Json response separately depending on 'count' value
             if (count == 1) {
                 jsonObject = jsonObject.optJSONObject("results")
                         .optJSONObject("quote");
                 if(!checkForNulls(jsonObject)){
                     batchOperations.add(buildBatchOperation(jsonObject));
                 }
-            } else {
+            }
+            else {
                 resultsArray = jsonObject.getJSONObject("results").getJSONArray("quote");
-
                 if (resultsArray != null && resultsArray.length() != 0) {
                     for (int i = 0; i < resultsArray.length(); i++) {
                         jsonObject = resultsArray.getJSONObject(i);
@@ -53,9 +53,8 @@ public class Utils {
                 }
             }
         }
-          else{
-            //Server down or network error edge case handled
-            Log.d(TAG, "error result : called " );
+        else{
+            //Return null in case of null response is received..
             return null;
         }
       }
@@ -65,7 +64,10 @@ public class Utils {
     return batchOperations;
   }
 
+
   public static String truncateBidPrice(String bidPrice){
+    //Locale.ENGLISH has been added to string.format() to get number in english format
+    //Even when the device is language is arabic or something else
     bidPrice = String.format(Locale.ENGLISH,"%.2f", Float.parseFloat(bidPrice));
     return bidPrice;
   }
@@ -87,6 +89,7 @@ public class Utils {
     return change;
   }
 
+
   public static ContentProviderOperation buildBatchOperation(JSONObject jsonObject){
     ContentProviderOperation.Builder builder = ContentProviderOperation.newInsert(
             QuoteProvider.Quotes.CONTENT_URI);
@@ -97,18 +100,12 @@ public class Utils {
       builder.withValue(QuoteColumns.PERCENT_CHANGE, truncateChange(
           jsonObject.getString("ChangeinPercent"), true));
       builder.withValue(QuoteColumns.CHANGE, truncateChange(change, false));
-      //builder.withValue(QuoteColumns.ISCURRENT, 1);
       if (change.charAt(0) == '-'){
         builder.withValue(QuoteColumns.ISUP, 0);
       }else{
         builder.withValue(QuoteColumns.ISUP, 1);
       }
 
-      //newly added columns
-        Log.d(TAG, "buildBatchOperation: COMPANY NAME " + jsonObject.getString("Name"));
-        Log.d(TAG, "buildBatchOperation: YEAR LOW " + jsonObject.getString("YearLow"));
-        Log.d(TAG, "buildBatchOperation: YEAR HIGH " + jsonObject.getString("YearHigh"));
-        Log.d(TAG, "buildBatchOperation: MARKET VALUE " + jsonObject.getString("MarketCapitalization"));
       builder.withValue(QuoteColumns.COMPANY_NAME,jsonObject.getString("Name"));
       builder.withValue(QuoteColumns.YEAR_LOW,jsonObject.getString("YearLow"));
       builder.withValue(QuoteColumns.YEAR_HIGH,jsonObject.getString("YearHigh"));
@@ -120,6 +117,11 @@ public class Utils {
     return builder.build();
   }
 
+    /**
+     * Check for null values is jsonobject received in response to avoid adding incorrect values in db.
+     * @param jsonObject
+     * @return
+     */
     private static boolean checkForNulls(JSONObject jsonObject){
         String bid_price = null;
         String change_in_percent = null;

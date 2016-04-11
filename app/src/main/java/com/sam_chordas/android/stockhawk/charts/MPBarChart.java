@@ -14,6 +14,9 @@ import com.sam_chordas.android.stockhawk.R;
 
 import java.util.ArrayList;
 
+/**
+ * Used to plot Weekly Bar Chart to show current week data
+ */
 public class MPBarChart {
 
     BarChart barChart;
@@ -24,6 +27,13 @@ public class MPBarChart {
         DrawingChart(amounts);
     }
 
+    public MPBarChart(CardView card){
+        barChart = (BarChart) card.findViewById(R.id.weekly_bar_chart);
+        barChart.setDescription("");
+        barChart.setNoDataText("");
+        barChart.setNoDataTextDescription("");
+        barChart.invalidate();
+    }
 
     private void SettingUpBarChart(){
         //Settings
@@ -66,15 +76,6 @@ public class MPBarChart {
         barChart.animateY(1500);
 
         barChart.setBackgroundColor(Color.parseColor("#343f57"));
-        barChart.invalidate();
-    }
-
-
-    public MPBarChart(CardView card){
-        barChart = (BarChart) card.findViewById(R.id.weekly_bar_chart);
-        barChart.setDescription("");
-        barChart.setNoDataText("");
-        barChart.setNoDataTextDescription("");
         barChart.invalidate();
     }
 

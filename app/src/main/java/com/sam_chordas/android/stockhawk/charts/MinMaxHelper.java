@@ -1,5 +1,8 @@
 package com.sam_chordas.android.stockhawk.charts;
 
+/**
+ * Helper class used to get MIN,MAX and STEP values to be used to plot line charts
+ */
 public class MinMaxHelper {
 
     static float getMin_value(float[] inputArray){

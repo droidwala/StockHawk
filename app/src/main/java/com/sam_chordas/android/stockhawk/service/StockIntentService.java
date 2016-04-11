@@ -21,6 +21,7 @@ public class StockIntentService extends IntentService {
     super(name);
   }
 
+
   @Override protected void onHandleIntent(Intent intent) {
     Log.d(StockIntentService.class.getSimpleName(), "Stock Intent Service");
     StockTaskService stockTaskService = new StockTaskService(this);
@@ -32,6 +33,8 @@ public class StockIntentService extends IntentService {
     // scheduling a task.
     int res  = stockTaskService.onRunTask(new TaskParams(intent.getStringExtra("tag"), args));
     Log.d(TAG, "IntentService : called  " + String.valueOf(res));
+
+    //Send broadcast to ProgressBarReceiver to indicate the result back to MystocksActivity.class
     Intent i = new Intent();
     i.setAction(MyStocksActivity.ProgressBarReceiver.RECEIVER_NAME);
     i.addCategory(Intent.CATEGORY_DEFAULT);

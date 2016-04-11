@@ -55,12 +55,15 @@ public class StockDetailActivity extends AppCompatActivity implements View.OnCli
     private ProgressBar weekly_progressBar,monthly_progressBar,sixty_progressBar;
     private CardView weekly_card,monthly_card,sixty_card;
 
-    ArrayList<String> weekly_close_amt = new ArrayList<>();//Used to store weekly data
+    //Used to store weekly data
+    ArrayList<String> weekly_close_amt = new ArrayList<>();
 
-    ArrayList<String> monthly_close_amt = new ArrayList<>();//Used to store monthly data
+    //Used to store monthly data
+    ArrayList<String> monthly_close_amt = new ArrayList<>();
     ArrayList<String> monthly_dates = new ArrayList<>();
 
-    ArrayList<String> sixty_close_amt = new ArrayList<>();//Used to store Past sixty days data
+    //Used to store Past sixty days data
+    ArrayList<String> sixty_close_amt = new ArrayList<>();
     ArrayList<String> sixty_dates = new ArrayList<>();
 
 
@@ -93,41 +96,45 @@ public class StockDetailActivity extends AppCompatActivity implements View.OnCli
         retry_connection.setOnClickListener(this);
 
 
-        //Fetching all extras passed in Intent
+        //Fetching all extras passed in Intent to populate stock related fields in toolbar
         Bundle b = getIntent().getExtras();
         stock_name = b.getString("STOCK");
         company_name.setText(b.getString("Name"));
-        if(!b.getString("YearLow").equals("null"))
+        if(!b.getString("YearLow").equals("null")) {
             year_low.setText("-" + b.getString("YearLow"));
-        else
+        }
+        else {
             year_low.setText("NA");
-
-        if(!b.getString("YearHigh").equals("null"))
+        }
+        if(!b.getString("YearHigh").equals("null")) {
             year_high.setText("+" + b.getString("YearHigh"));
-        else
+        }
+        else {
             year_high.setText("NA");
-
-        if(!b.getString("MarketValue").equals("null"))
+        }
+        if(!b.getString("MarketValue").equals("null")) {
             market_value.setText("$" + b.getString("MarketValue"));
-        else
+        }
+        else {
             market_value.setText("NA");
-
-        Log.d(TAG, "onCreate: called " + b.getString("STOCK"));
+        }
 
         //Initializing all date variables.
         InitializingDates();
+
+        //Fetch all data to be populated in graphs
         fetchGraphData();
 
     }
 
     private void fetchGraphData(){
         if(isConnected()) {
-            //Create weekly api query for the given stock name
             error_txt.setVisibility(View.GONE);
             retry_connection.setVisibility(View.GONE);
             weekly_card.setVisibility(View.VISIBLE);
             monthly_card.setVisibility(View.VISIBLE);
             sixty_card.setVisibility(View.VISIBLE);
+            //Simultaneously fetch the data for all 3 graphs
             try {
                 //Fetching weekly data
                 weekly_progressBar.setVisibility(View.VISIBLE);
@@ -145,6 +152,7 @@ public class StockDetailActivity extends AppCompatActivity implements View.OnCli
             }
         }
         else{
+            //In case device is not connected to internet
             error_txt.setVisibility(View.VISIBLE);
             retry_connection.setVisibility(View.VISIBLE);
             weekly_card.setVisibility(View.GONE);
@@ -160,45 +168,43 @@ public class StockDetailActivity extends AppCompatActivity implements View.OnCli
         client.newCall(request).enqueue(new Callback() {
             @Override
             public void onFailure(Request request, IOException e) {
-                //We are yet to implement a way to handle timeout exception..
+
             }
 
             @Override
             public void onResponse(Response response) throws IOException {
                 String result = response.body().string();
                 int result_count = getResultCount(result);
-
+                //Two different objects needs to be use for Gson parsing depending on result count
                 if (result_count > 1) {
                     Gson gson = new Gson();
-                    History history = gson.fromJson(result, new TypeToken<History>() {
-                    }.getType());
+                    History history = gson.fromJson(result, new TypeToken<History>(){}.getType());
                     if (history.getQuery().getResults() != null) {
                         ArrayList<History.QueryEntity.ResultsEntity.QuoteEntity> quotes = (ArrayList<History.QueryEntity.ResultsEntity.QuoteEntity>) history.getQuery().getResults().getQuote();
-                        Log.d(TAG, "onResponse: Weekly " + String.valueOf(quotes.size()));
                         for (int i = 0; i < quotes.size(); i++) {
                             weekly_close_amt.add(quotes.get(i).getAdj_Close());
-
                         }
-                        Collections.reverse(weekly_close_amt);//need to reverse the data as it is received in desc order
+                        //need to reverse the data as it is received in desc order
+                        Collections.reverse(weekly_close_amt);
+                        //We add up zero values to get at least 5 values to be displayed in Bar Chart
                         if (weekly_close_amt.size() < 5) {
                             for (int j = weekly_close_amt.size(); j < 5; j++) {
                                 weekly_close_amt.add("0");
                             }
                         }
                     } else {
-                        Log.d(TAG, "Result count is greater than 1 but still the results object is null");
+                        Log.d(TAG, "This else condition is called only when result_count>1 but there is no result object." +
+                                "this will never happen..unless the api endpoint is broken");
                     }
                 }
                 else if (result_count == 1) {
                     //Different Object is used to use Gson parsing when the result count is 1
                     //Because Json structure is different from the usual response we get in such cases(res_count==1)
                     Gson gson = new Gson();
-                    OneDayHistory oneDayHistory = gson.fromJson(result, new TypeToken<OneDayHistory>() {
-                    }.getType());
+                    OneDayHistory oneDayHistory = gson.fromJson(result, new TypeToken<OneDayHistory>(){}.getType());
                     if (oneDayHistory.getQuery().getResults() != null) {
                         OneDayHistory.QueryEntity.ResultsEntity.QuoteEntity quote = oneDayHistory.getQuery().getResults().getQuote();
                         weekly_close_amt.add(quote.getAdj_Close());
-
                     }
                     Collections.reverse(weekly_close_amt);
                     if (weekly_close_amt.size() < 5) {
@@ -214,14 +220,13 @@ public class StockDetailActivity extends AppCompatActivity implements View.OnCli
                         @Override
                         public void run() {
                             no_weekly_data.setText(StockDetailActivity.this.getResources().getString(R.string.week_started));
-                            Log.d(TAG, "NO DATA FOR CURRENT WEEK BRO!!");
                         }
                     });
 
                 }
                 else{
                     //If all the above conditions don't satisfy it means
-                    // the historical data is not available for the stock
+                    //the historical data is not available for the stock
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
@@ -232,6 +237,7 @@ public class StockDetailActivity extends AppCompatActivity implements View.OnCli
                 }
 
                 runOnUiThread(new Runnable() {
+                    //Once the parsing is done,we plot the bar chart using weekly_close_amt arraylist as below
                     @Override
                     public void run() {
                         weekly_progressBar.setVisibility(View.INVISIBLE);
@@ -250,10 +256,8 @@ public class StockDetailActivity extends AppCompatActivity implements View.OnCli
 
     }
 
-    
+    //Logic to plot monthly and past sixty days data is nearly identical
     private void FetchMonthlyData(String url) throws IOException{
-
-
         Request request = new Request.Builder()
                 .url(url).build();
 
@@ -275,7 +279,8 @@ public class StockDetailActivity extends AppCompatActivity implements View.OnCli
                         monthly_close_amt = data.get("amounts");
                     }
                     else{
-                        Log.d(TAG, "onResponse: DANG!!");
+                        Log.d(TAG, "This else condition is called only when result_count>1 but there is no result object." +
+                                "this will never happen..unless the api endpoint is broken");
                     }
                 }
                 else{
@@ -289,6 +294,7 @@ public class StockDetailActivity extends AppCompatActivity implements View.OnCli
                 }
 
                 runOnUiThread(new Runnable() {
+                    //Once the gson parsing is done, we plot line chart using monthly_close_amt arraylist as below
                     @Override
                     public void run() {
                         monthly_progressBar.setVisibility(View.INVISIBLE);
@@ -302,7 +308,7 @@ public class StockDetailActivity extends AppCompatActivity implements View.OnCli
         });
     }
 
-
+    //Used to plot past sixty days data in linechart
     private void FetchSixtyData(String url) throws IOException{
         Request request = new Request.Builder()
                 .url(url).build();
@@ -326,7 +332,8 @@ public class StockDetailActivity extends AppCompatActivity implements View.OnCli
                         sixty_close_amt = data.get("amounts");
                     }
                     else{
-                        Log.d(TAG, "onResponse: DANG!!");
+                        Log.d(TAG, "This else condition is called only when result_count>1 but there is no result object." +
+                                "this will never happen..unless the api endpoint is broken");
                     }
                 }
                 else{
@@ -341,6 +348,7 @@ public class StockDetailActivity extends AppCompatActivity implements View.OnCli
                 }
 
                 runOnUiThread(new Runnable() {
+                    //Linechart is plotted once the Gson parsing is done.
                     @Override
                     public void run() {
                         sixty_progressBar.setVisibility(View.INVISIBLE);
@@ -354,6 +362,7 @@ public class StockDetailActivity extends AppCompatActivity implements View.OnCli
         });
     }
 
+    //Parse json response to check for count value returned by api endpoint
     private int getResultCount(String response){
         JsonParser parser = new JsonParser();
         JsonObject object = parser.parse(response).getAsJsonObject();
@@ -362,6 +371,7 @@ public class StockDetailActivity extends AppCompatActivity implements View.OnCli
         return count.getAsInt();
     }
 
+    //Generates all dates to be used to create graph data
     private void InitializingDates(){
         Calendar c = Calendar.getInstance();
         c.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
@@ -384,6 +394,7 @@ public class StockDetailActivity extends AppCompatActivity implements View.OnCli
 
     }
 
+    //Checks for network connection
     private boolean isConnected(){
         ConnectivityManager cm = (ConnectivityManager) StockDetailActivity.this.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
@@ -391,7 +402,7 @@ public class StockDetailActivity extends AppCompatActivity implements View.OnCli
                 activeNetwork.isConnectedOrConnecting());
     }
 
-
+    //Generate Rest API endpoint using the stock_name(obtained from bundle in oncreate),start and end data passed to function.
     private String GenerateUrl(String d1,String d2){
         StringBuilder urlString = new StringBuilder();
         urlString.append(BASE_URL);
@@ -409,6 +420,8 @@ public class StockDetailActivity extends AppCompatActivity implements View.OnCli
     }
 
 
+    //Common method to parse monthly and past sixty days data
+    //Returns HashMap with labels and values arraylist used to plot graphs
     private HashMap<String,ArrayList<String>> parsingResponse(String result){
 
         ArrayList<String> dates = new ArrayList<>();
@@ -444,6 +457,7 @@ public class StockDetailActivity extends AppCompatActivity implements View.OnCli
         return  data;
     }
 
+    //Retry button handling in case device is not connected to internet.
     @Override
     public void onClick(View view) {
         if(view.getId()==R.id.stock_detail_retry_connection){

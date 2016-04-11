@@ -33,6 +33,7 @@ public class QuoteCursorAdapter extends CursorRecyclerViewAdapter<QuoteCursorAda
   public QuoteCursorAdapter(Context context, Cursor cursor){
     super(context, cursor);
     mContext = context;
+    //set up isTalkBackOn boolean variable depending on whether talkback mode is on or not.
     if(isAccessibilityOn())
        isTalkBackOn = true;
   }
@@ -51,23 +52,7 @@ public class QuoteCursorAdapter extends CursorRecyclerViewAdapter<QuoteCursorAda
     viewHolder.symbol.setText(cursor.getString(cursor.getColumnIndex("symbol")));
     viewHolder.bidPrice.setText(cursor.getString(cursor.getColumnIndex("bid_price")));
 
-    if(isTalkBackOn) {
-      String company_name = cursor.getString(cursor.getColumnIndex("company_name"));
-      String bid_price = cursor.getString(cursor.getColumnIndex("bid_price"));
-      String percent_change = cursor.getString(cursor.getColumnIndex("percent_change"));
-      String change = cursor.getString(cursor.getColumnIndex("change"));
-      viewHolder.symbol.setContentDescription("Stock name is " + company_name + "Move right to know bid price");
-      viewHolder.bidPrice.setContentDescription("Bid price of" + company_name + "stock is" +  bid_price);
-
-
-      if (Utils.showPercent){
-        viewHolder.change.setContentDescription("Percentage Change in " + company_name + "stock is " +  percent_change);
-      } else{
-        viewHolder.change.setContentDescription("Change in stock price is " + company_name + "stock is " + change);
-      }
-
-    }
-      int sdk = Build.VERSION.SDK_INT;
+    int sdk = Build.VERSION.SDK_INT;
     if (cursor.getInt(cursor.getColumnIndex("is_up")) == 1){
       if (sdk < Build.VERSION_CODES.JELLY_BEAN){
         viewHolder.change.setBackgroundDrawable(
@@ -86,6 +71,7 @@ public class QuoteCursorAdapter extends CursorRecyclerViewAdapter<QuoteCursorAda
             mContext.getResources().getDrawable(R.drawable.percent_change_pill_red));
       }
     }
+
     if (Utils.showPercent){
       viewHolder.change.setText(cursor.getString(cursor.getColumnIndex("percent_change")));
      }
@@ -94,14 +80,31 @@ public class QuoteCursorAdapter extends CursorRecyclerViewAdapter<QuoteCursorAda
      }
 
 
+    //Set up content descriptions on item's in recylerview dynamically when talkback mode is ON.
+    if(isTalkBackOn) {
+      String company_name = cursor.getString(cursor.getColumnIndex("company_name"));
+      String bid_price = cursor.getString(cursor.getColumnIndex("bid_price"));
+      String percent_change = cursor.getString(cursor.getColumnIndex("percent_change"));
+      String change = cursor.getString(cursor.getColumnIndex("change"));
+      viewHolder.symbol.setContentDescription("Stock name is " + company_name + "Move right to know bid price");
+      viewHolder.bidPrice.setContentDescription("Bid price of" + company_name + "stock is" +  bid_price);
+
+
+      if (Utils.showPercent){
+        viewHolder.change.setContentDescription("Percentage Change in " + company_name + "stock is " +  percent_change);
+      } else{
+        viewHolder.change.setContentDescription("Change in stock price is " + company_name + "stock is " + change);
+      }
+
+    }
   }
 
+  //Called when item is swiped either right/left in recylerview
   @Override
   public void onItemDismiss(int position) {
     Cursor c = getCursor();
     c.moveToPosition(position);
     String symbol = c.getString(c.getColumnIndex(QuoteColumns.SYMBOL));
-    Log.d("SwipeRemove", "Removing Stock : " + symbol);
     mContext.getContentResolver().delete(QuoteProvider.Quotes.CONTENT_URI,QuoteColumns.SYMBOL + "=?",new String[]{symbol});
     notifyItemRemoved(position);
     //Below broadcast needs to be sent to MyStocksActivity due to existing(below) issue with melynkov's fab button implementation.
@@ -111,8 +114,11 @@ public class QuoteCursorAdapter extends CursorRecyclerViewAdapter<QuoteCursorAda
 
     Intent intent = new Intent(MyStocksActivity.ProgressBarReceiver.RECEIVER_NAME);
     intent.putExtra("RESULT", 299);
-    if(c.getCount()==1)
-        intent.putExtra("EMPTY",true);
+    if(c.getCount()==1){
+      //We pass empty=true when the all the stocks in list are removed by swiping.
+      // So,MyStockActivity can display the no stock in the list message accordingly..
+      intent.putExtra("EMPTY",true);
+    }
     mContext.sendBroadcast(intent);
   }
 
@@ -142,12 +148,14 @@ public class QuoteCursorAdapter extends CursorRecyclerViewAdapter<QuoteCursorAda
     @Override
     public void onItemClear(){
       itemView.setBackgroundColor(0);
+      //Send broadcast to QuoteWidgetProvider class to update the widget whenever a stock is removed from list.
       Intent swipe_intent = new Intent(QuoteWidgetProvider.STOCK_REMOVED_INTENT);
       mContext.sendBroadcast(swipe_intent);
     }
 
   }
 
+  //Checks whether TalkBack mode is on or off on device
   private boolean isAccessibilityOn(){
     AccessibilityManager am = (AccessibilityManager) mContext.getSystemService(Context.ACCESSIBILITY_SERVICE);
     return am.isEnabled() && am.isTouchExplorationEnabled();
