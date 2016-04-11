@@ -168,7 +168,12 @@ public class StockDetailActivity extends AppCompatActivity implements View.OnCli
         client.newCall(request).enqueue(new Callback() {
             @Override
             public void onFailure(Request request, IOException e) {
-
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        no_weekly_data.setText(StockDetailActivity.this.getResources().getString(R.string.stock_detail_fetch_error));
+                    }
+                });
             }
 
             @Override
@@ -265,6 +270,12 @@ public class StockDetailActivity extends AppCompatActivity implements View.OnCli
             @Override
             public void onFailure(Request request, IOException e) {
                 e.printStackTrace();
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        no_monthly_data.setText(StockDetailActivity.this.getResources().getString(R.string.stock_detail_fetch_error));
+                    }
+                });
             }
 
             @Override
@@ -317,6 +328,12 @@ public class StockDetailActivity extends AppCompatActivity implements View.OnCli
             @Override
             public void onFailure(Request request, IOException e) {
                 e.printStackTrace();
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        no_sixty_data.setText(StockDetailActivity.this.getResources().getString(R.string.stock_detail_fetch_error));
+                    }
+                });
             }
 
             @Override

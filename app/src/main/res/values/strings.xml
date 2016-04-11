@@ -28,7 +28,7 @@
   <string name="no_stocks">No stocks added in the list.\n\t\tStart adding stocks! :)</string>
   <string name="fetching_error">Error occurred while fetching data.
 Please try again!</string>
-
+  <string name="stock_detail_fetch_error">Error occurred while gathering\ndata to plot graph.\nPlease check your network connection\nAnd re-launch this screen again!</string>
 
   <string-array name="intervals">
     <item>5 minutes</item>

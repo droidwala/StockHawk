@@ -32,7 +32,10 @@
 البدء في إضافة الأسهم!</string>
     <string name="fetching_error">حدث خطأ أثناء جلب البيانات.
 حاول مرة اخرى!</string>
-
+    <string name="stock_detail_fetch_error">حدث خطأ أثناء جمع
+البيانات في رسم بياني.
+يرجى التحقق من الاتصال بالشبكة
+وإعادة إطلاق هذه الشاشة مرة أخرى</string>
     <!--Strings for conent_desc -->
     <string name="desc_fab">بحث الأوراق المالية من قبل رمز</string>
     <string name="desc_no_internet">محاولة اتصال</string>
