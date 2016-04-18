@@ -1,7 +1,19 @@
-.gradle
+# Built files
+build/
+out/
+gen/
+
+# Local configuration file
 /local.properties
-/.idea/workspace.xml
-/.idea/libraries
+
+# Android Studio files
+*.iml
+*.iws
+*.ipr
+.idea/
+
+# Gradle
+.gradle
+
+
 .DS_Store
-/build
-/captures
